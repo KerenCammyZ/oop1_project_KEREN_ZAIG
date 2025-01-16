@@ -6,7 +6,7 @@ void GameManager::runGame()
 
     //textures
     sf::Texture gameBackround;
-    gameBackround.loadFromFile("gameBackround.png");
+    gameBackround.loadFromFile("gameBackround.png");git
     sf::Sprite gameBackroundSprite(gameBackround);
 
     if (!openPlaylist()) {
