@@ -7,8 +7,8 @@
 class GameManager {
 public:
 	void runGame();
-	bool openPlaylist();
-	void drawLevel(sf::RenderWindow& window, const std::string& fileName, int levelIndex);
+	//bool openPlaylist();
+	void drawLevel(sf::RenderWindow& window, const std::string& fileName) const;
 	bool openLevel(int i);
 
 private:
@@ -17,6 +17,7 @@ private:
 	std::string m_currentLevelName;
 	bool m_levelCompleted = false;
 	std::vector<std::vector<sf::RectangleShape>> m_board;
-	int m_toolbarHeight = 50; //space for toolbar
-	int m_tileSize = 50; //size of each tile
+	int m_toolbarHeight = 200; //space for toolbar
+	int m_tileSize = 69; //size of each tile
+	sf::RenderWindow m_window = sf::RenderWindow(sf::VideoMode(2400, 1600), "Bomberman");
 };

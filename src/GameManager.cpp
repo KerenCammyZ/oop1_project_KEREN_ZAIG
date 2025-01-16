@@ -2,82 +2,32 @@
 
 void GameManager::runGame()
 {
-    auto window = sf::RenderWindow(sf::VideoMode(2400, 1600), "Bomberman");
-
-    //textures
+    
+    //backround
     sf::Texture gameBackround;
-    gameBackround.loadFromFile("gameBackround.png");git
+    gameBackround.loadFromFile("gameBackround.png");
     sf::Sprite gameBackroundSprite(gameBackround);
 
-    if (!openPlaylist()) {
-        std::cerr << "Open Playlist failed. Exiting...\n";
-    }
+	//window handling
+	while (m_window.isOpen())
+	{
 
-    if (m_levels.empty()) {
-        std::cerr << "No levels found in Playlist.txt. Exiting...\n";
-        return;
-    }
-    else
-    {
-        for (int i = 0; i < m_levels.size(); i++)
-        {
-            if (!openLevel(i))
-            {
-                std::cerr << "Open Level failed. Exiting...\n";
-                return;
-            }
-            else
-            {
-                //run game
-                std::cout << "Running level " << m_levels[i] << "\n";
+		if (auto event = sf::Event{}; m_window.waitEvent(event))
+		{
+			m_window.clear(sf::Color::White);
+			m_window.draw(gameBackroundSprite);
+            drawLevel(m_window, "level001.txt");
+			m_window.display();
+			switch (event.type)
+			{
+			case sf::Event::Closed:
+				m_window.close();
+				break;
+			}
+		}
 
-                //set board
-
-
-                //window handling
-                while (window.isOpen())
-                {
-                    //print board
-                    if (m_board.empty())
-                    {
-                        std::cerr << "No board found. Exiting...\n";
-                        return;
-                    }
-                    else
-                    {
-                        for (int i = 0; i < m_board.size(); i++)
-                        {
-                            for (int j = 0; j < m_board[i].size(); j++)
-                            {
-                                window.draw(m_board[i][j]);
-                            }
-                        }
-
-                        if (auto event = sf::Event{}; window.waitEvent(event))
-                        {
-                            window.clear(sf::Color::White);
-                            window.draw(gameBackroundSprite);
-                            window.display();
-                            switch (event.type)
-                            {
-                            case sf::Event::Closed:
-                                window.close();
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-    }
+	}
 }
-
-bool GameManager::openPlaylist()
-{
-    return false;
-}
-
 
 bool GameManager::openLevel(int i)
 {
@@ -92,7 +42,7 @@ bool GameManager::openLevel(int i)
 	return true;
 }
 
-void GameManager::drawLevel(sf::RenderWindow& window, const std::string& fileName, int levelIndex) {
+void GameManager::drawLevel(sf::RenderWindow& window, const std::string& fileName) const {
 
     std::ifstream file(fileName);
     if (!file) {
