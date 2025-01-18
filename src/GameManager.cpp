@@ -16,76 +16,33 @@ void GameManager::runGame()
 		{
 			m_window.clear(sf::Color::White);
 			m_window.draw(gameBackroundSprite);
-            //drawLevel(m_window, "level001.txt");
 			m_board.drawLevel(m_window, "level001.txt");
-			
+			m_player.drawPlayer(m_window);
 			m_window.display();
 			switch (event.type)
 			{
 			case sf::Event::Closed:
 				m_window.close();
 				break;
+			case sf::Event::KeyPressed:
+				switch (event.key.code)
+				{
+				case sf::Keyboard::Up:
+					m_player.movePlayer(0, -1, m_board);
+					break;
+				case sf::Keyboard::Down:
+					m_player.movePlayer(0, 1, m_board);
+					break;
+				case sf::Keyboard::Left:
+					m_player.movePlayer(-1, 0, m_board);
+					break;
+				case sf::Keyboard::Right:
+					m_player.movePlayer(1, 0, m_board);
+					break;
+				}
+				break;
 			}
 		}
 
 	}
 }
-
-//void GameManager::drawLevel(sf::RenderWindow& window, const std::string& fileName) const {
-//
-//    std::ifstream file(fileName);
-//    if (!file) {
-//        std::cerr << "Cannot open level file: " << fileName << "\n";
-//        return;
-//    }
-//
-//    // Load textures for sprites
-//    sf::Texture wallTexture, rockTexture, doorTexture;
-//    if (!wallTexture.loadFromFile("wall.png") ||
-//        !rockTexture.loadFromFile("rock.png") ||
-//        !doorTexture.loadFromFile("door.png")) {
-//        std::cerr << "Failed to load one or more textures.\n";
-//        return;
-//    }
-//
-//    // Prepare reusable sprites
-//    sf::Sprite wallSprite(wallTexture);
-//    sf::Sprite rockSprite(rockTexture);
-//    sf::Sprite doorSprite(doorTexture);
-//
-//    // Parse the file and draw the board
-//
-//    int row = 0;
-//    std::string line;
-//
-//    while (std::getline(file, line)) {
-//        for (int col = 0; col < line.size(); ++col) {
-//            char tile = line[col];
-//            sf::Sprite* sprite = nullptr;
-//
-//            // Determine which sprite to use based on the character
-//            switch (tile) {
-//            case '#':
-//                sprite = &wallSprite;
-//                break;
-//            case '@':
-//                sprite = &rockSprite;
-//                break;
-//            case 'D':
-//                sprite = &doorSprite;
-//                break;
-//            default:
-//                // Skip unknown tiles
-//                continue;
-//            }
-//
-//            // Set sprite position and draw it
-//            if (sprite) {
-//                sprite->setPosition(col * m_tileSize, row * m_tileSize + m_toolbarHeight);
-//                window.draw(*sprite);
-//            }
-//        }
-//        ++row;
-//    }
-//
-//}

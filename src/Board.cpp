@@ -88,3 +88,30 @@ void Board::drawLevel(sf::RenderWindow& window, const std::string& fileName) {
 		}
 	}  
 }
+
+sf::Vector2f Board::getTilePosition(int row, int col)
+{
+    if (!(m_board.empty() || row < 0 || row >= m_row || col < 0 || col >= m_col))
+    {
+        return m_board[row][col].getPosition();
+    }
+    else
+        return sf::Vector2f(-1,-1);
+}
+
+sf::Texture* Board::getTexture(sf::Vector2f position)
+{
+	if (!(m_board.empty()))
+	{
+		for (int row = 0; row < m_row; ++row) {
+			for (int col = 0; col < m_col; ++col) {
+				if (m_board[row][col].getPosition() == position)
+				{
+					//return m_board[row][col].getTexture();
+                    return nullptr;
+				}
+			}
+		}
+	}
+	return nullptr; // Return nullptr if no texture is found
+}
