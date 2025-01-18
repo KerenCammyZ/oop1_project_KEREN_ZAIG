@@ -4,3 +4,17 @@
 #include <iostream>
 #include <string>
 #include <vector>
+
+class Board {
+public:
+	Board();
+	void drawLevel(sf::RenderWindow& window, const std::string& fileName);
+
+private:
+	int m_row;
+	int m_col;
+	std::vector<std::vector<sf::Sprite>> m_board;
+	int m_toolbarHeight = 200; //space for toolbar
+	int m_tileSize = 69; //size of each tile
+	//sf::RenderWindow m_window;
+};
