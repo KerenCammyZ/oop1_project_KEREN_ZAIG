@@ -15,6 +15,6 @@ private:
 	int m_row;
 	int m_col;
 	std::vector<std::vector<sf::Sprite>> m_board;
-	int m_toolbarHeight = 200; //space for toolbar TODO: add to parent class
-	int m_tileSize = 69; //size of each tile TODO: add to parent class
+	int m_toolbarHeight = 200; //space for toolbar
+	int m_tileSize = 69; //size of each tile
 };
