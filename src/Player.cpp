@@ -19,11 +19,14 @@ void Player::drawPlayer(sf::RenderWindow& window)
 
 void Player::movePlayer(int x, int y, Board &board)
 {
+	 
 	//check for collision
 	sf::Vector2f currentPosition = m_playerSprite.getPosition();
 	sf::Vector2f newPosition = currentPosition + sf::Vector2f(x * 69, y * 69);
 
-//	if((newPosition == ))
+	/*if ((newPosition == board.getTilePosition(x, y) && board.getTexture(x,y) == m_wallTexture)) {
+
+	}*/
 
 	m_playerSprite.move(x * m_tileSize, y * m_tileSize);
 }

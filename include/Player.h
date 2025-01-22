@@ -9,8 +9,8 @@ public:
 private:
 	sf::Texture m_playerTexture;
 	sf::Sprite m_playerSprite;
-	int m_toolbarHeight = 200; //space for toolbar
-	int m_tileSize = 69; //size of each tile
+	int m_toolbarHeight = 200; //space for toolbar TODO: add to parent class
+	int m_tileSize = 69; //size of each tile TODO: add to parent class
 	sf::Texture m_wallTexture, m_rockTexture, m_doorTexture;
 	
 };

@@ -14,6 +14,6 @@ private:
 	sf::RenderWindow m_window = sf::RenderWindow(sf::VideoMode(2400, 1600), "Bomberman");
 	Player m_player;
 
-	std::vector<std::string> m_levels;
-	std::string m_currentLevelName;
+	//std::vector<std::string> m_levels;
+	//std::string m_currentLevelName;
 };
