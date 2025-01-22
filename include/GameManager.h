@@ -1,19 +1,18 @@
-#include "Board.h"
-#include "Player.h"
+#include "GameObject.h"
+#include <fstream>
+#include <string>
+#include <iostream>
 
 class GameManager {
 public:
 	void runGame();
+	void draw();
 	//bool openPlaylist();
-	//void drawLevel(sf::RenderWindow& window, const std::string& fileName) const;
+	void drawLevel(const std::string& fileName) const;
 
 private:
-	Board m_board;
-	int m_toolbarHeight = 200; //space for toolbar
-	int m_tileSize = 69; //size of each tile
-	sf::RenderWindow m_window = sf::RenderWindow(sf::VideoMode(2400, 1600), "Bomberman");
-	Player m_player;
-
-	//std::vector<std::string> m_levels;
-	//std::string m_currentLevelName;
+	std::vector<std::vector<GameObject>> m_gameObjects;
+	sf::RenderWindow m_window;
+	size_t toolbarSize = 69;
+	size_t m_width, m_height, m_tileSize;
 };

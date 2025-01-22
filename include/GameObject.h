@@ -1,7 +1,7 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 #include <vector>
-class GameObject {
+class GameObject : public GameManager{
 public:
 	void draw(sf::RenderWindow& window) const;
 	//sf::Vector2f getPosition() const;
