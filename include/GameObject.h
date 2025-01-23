@@ -1,12 +1,13 @@
 #pragma once
 #include <SFML/Graphics.hpp>
-#include <vector>
-#include "GameManager.h"
+#include <string>
 
-class GameObject : public GameManager{
+class GameManager;
+
+class GameObject {
 public:
 	GameObject() = default;
-	GameObject(sf::RenderWindow &window);
+	GameObject(sf::RenderWindow &window, sf::Vector2f postition);
 	void draw() const;
 	sf::Vector2f getPosition() const;
 	sf::Sprite getSprite() const;
@@ -22,5 +23,5 @@ private:
 	sf::Vector2f m_position = sf::Vector2f(0,0);
 	sf::Texture m_texture;
 	sf::Sprite m_sprite;
-	size_t m_tileSize;
+	int m_tileSize;
 };
