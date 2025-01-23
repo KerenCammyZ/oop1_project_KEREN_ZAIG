@@ -13,6 +13,7 @@ public:
 private:
 	std::vector<std::vector<GameObject>> m_gameObjects;
 	sf::RenderWindow m_window;
-	size_t toolbarSize = 69;
-	size_t m_width, m_height, m_tileSize;
+	int m_tileSize = 69;
+	int m_width = 0, m_height = 0, m_lives = 3;
+	
 };
