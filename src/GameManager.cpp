@@ -86,7 +86,7 @@ void GameManager::drawLevel(const std::string& fileName)
 				break;
 			case 'R':
 				gameObject = new GameObject(m_window, sf::Vector2f(col * m_tileSize, row * m_tileSize));
-				gameObject->setTexture("wall.png");
+				gameObject->setTexture("rock.png");
 				break;
 			case 'D':
 				gameObject = new GameObject(m_window, sf::Vector2f(col * m_tileSize, row * m_tileSize));
