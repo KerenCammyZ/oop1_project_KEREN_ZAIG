@@ -13,8 +13,11 @@ public:
 	void setTexture(sf::Texture texturePath);
 	void setTileSize(int tileSize);
 	void setSprite(const sf::Sprite& sprite);
-	void setSpriteTexture(sf::Texture);
 	std::string getName() const;
+	void moveSprite(const sf::Vector2f& offset)
+	{
+		m_sprite.move(offset);
+	}
 private:
 	sf::RenderWindow* m_window; // Change to pointer
 	sf::Vector2f m_position = sf::Vector2f(0,0);

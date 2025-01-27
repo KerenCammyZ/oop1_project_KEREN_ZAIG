@@ -1,26 +1,26 @@
 #include "GameManager.h"
 
 
-GameManager::GameManager() : m_player(m_window, sf::Vector2f(20, 20)) {
+GameManager::GameManager() : m_player(m_window, sf::Vector2f(40, 40)) {
 	m_width = 0;
 	m_height = 0;
-	m_tileSize = 20;
+	m_tileSize = 40;
 
-	m_player.setTexture(getTexture("player.png"));
-	m_player.setPosition(sf::Vector2f(20, 20));
+	m_player.setTexture(loadTexture("player.png"));
+	m_player.setPosition(sf::Vector2f(40, 40));
 }
 
 GameManager::~GameManager() {
-	for (auto& row : m_gameObjects) {
+	for (auto& row : m_board) {
 		for (auto& obj : row) {
 			delete obj;
 			obj = nullptr; // Avoid dangling pointers
 		}
 	}
-	m_gameObjects.clear();
+	m_board.clear();
 }
 
-const sf::Texture& GameManager::getTexture(const std::string& texturePath) {
+const sf::Texture& GameManager::loadTexture(const std::string& texturePath) {
 	// Check if the texture is already loaded
 	if (m_textures.find(texturePath) == m_textures.end()) {
 		// Load the texture and store it
@@ -35,10 +35,10 @@ const sf::Texture& GameManager::getTexture(const std::string& texturePath) {
 
 void GameManager::draw()
 {
-	if (m_window.isOpen() && !m_gameObjects.empty()) {
-		for (const auto& row : m_gameObjects) {
+	if (m_window.isOpen() && !m_board.empty()) {
+		for (const auto& row : m_board) {
 			for (const auto& obj : row) {
-				if (obj) { // Check for valid pointer
+				if (obj) { 
 					obj->draw();
 				}
 			}
@@ -73,8 +73,8 @@ void GameManager::drawLevel(const std::string& fileName)
 	m_width = windowWidth;
 	m_height = windowHeight + m_tileSize;
 
-	m_gameObjects.resize(numRows);
-	for (auto& row : m_gameObjects) {
+	m_board.resize(numRows);
+	for (auto& row : m_board) {
 		row.resize(numCols, nullptr);
 	}
 
@@ -84,59 +84,71 @@ void GameManager::drawLevel(const std::string& fileName)
 			GameObject* gameObject = nullptr;
 
 			switch (tile) {
+			
 			case '#':
 				gameObject = new GameObject(m_window, sf::Vector2f(col * m_tileSize, row * m_tileSize));
-				gameObject->setTexture(getTexture("wall.png"));
+				gameObject->setTexture(loadTexture("wall.png"));
 				break;
-			case 'R':
+			case '@':
 				gameObject = new GameObject(m_window, sf::Vector2f(col * m_tileSize, row * m_tileSize));
-				gameObject->setTexture(getTexture("rock.png"));
+				gameObject->setTexture(loadTexture("rock.png"));
 				break;
 			case 'D':
 				gameObject = new GameObject(m_window, sf::Vector2f(col * m_tileSize, row * m_tileSize));
-				gameObject->setTexture(getTexture("door.png"));
+				gameObject->setTexture(loadTexture("door.png"));
 				break;
 			default:
-				break; // Leave the pointer as nullptr for empty spaces
+				break;
 			}
 
-			m_gameObjects[row][col] = gameObject;
+			m_board[row][col] = gameObject;
+			if (gameObject) {
+				if (!gameObject->getSprite().getTexture()) {
+					std::cerr << "Error: object texture not set properly.\n";
+				}
+			}
 		}
 	}
 }
 
-void GameManager::runGame()
+void GameManager::runGame() 
 {
-    //backround
-    sf::Texture gameBackround;
-    gameBackround.loadFromFile("gameBackround.png");
-    sf::Sprite gameBackroundSprite(gameBackround);
-	//window
+	// Load level
 	drawLevel("level001.txt");
-	//m_window.setFramerateLimit(60);
+	m_window.setFramerateLimit(60);
 
-	//window handling
-	while (m_window.isOpen())
+	sf::Clock clock;
+
+	// Main game loop
+	while (m_window.isOpen()) 
 	{
+		// Calculate delta time for this frame
+		const auto deltaTime = clock.restart();
 
-		if (auto event = sf::Event{}; m_window.waitEvent(event))
-		{
-			m_window.clear(sf::Color::White);
-			m_window.draw(gameBackroundSprite);
-			draw();
-			m_player.draw();
-			m_window.display();
-
-			switch (event.type)
-			{
+		// Process events
+		sf::Event event;
+		while (m_window.pollEvent(event)) {
+			switch (event.type) {
 			case sf::Event::Closed:
 				m_window.close();
 				break;
+
 			case sf::Event::KeyPressed:
-				m_player.move(event.key.code, &m_gameObjects);
+				m_player.setDirection(event.key.code);
+				break;
+
+			default:
 				break;
 			}
 		}
+
+		// Update game state
+		m_player.move(deltaTime);
+
+		// Render the scene
+		m_window.clear(sf::Color::White);
+		draw();          //draw level objects
+		m_player.draw(); 
+		m_window.display();
 	}
 }
-

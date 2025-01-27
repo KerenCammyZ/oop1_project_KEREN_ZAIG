@@ -12,14 +12,14 @@ class GameManager {
 public:
 	GameManager();
 	~GameManager();
-	const sf::Texture& getTexture(const std::string& texturePath);
+	const sf::Texture& loadTexture(const std::string& texturePath);
 	void runGame();
 	void draw();
 	//bool openPlaylist();
 	void drawLevel(const std::string& fileName);
 
 private:
-	std::vector<std::vector<GameObject*>> m_gameObjects;
+	std::vector<std::vector<GameObject*>> m_board;
 	sf::RenderWindow m_window;
 	int m_tileSize;
 	int m_width, m_height;
