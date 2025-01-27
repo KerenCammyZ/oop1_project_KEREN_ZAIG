@@ -3,8 +3,8 @@
 
 class Player : public MovingObject{
 public:
-	Player();
-	
+	Player(sf::RenderWindow& window, sf::Vector2f position);
+	Player();	
 private:
 	int m_lives = 3;
 	int m_score = 0;

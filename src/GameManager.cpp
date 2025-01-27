@@ -1,9 +1,13 @@
 #include "GameManager.h"
 
 
-GameManager::GameManager()
-{
-	m_width = 0, m_height = 0, m_lives = 3, m_tileSize = 69;
+GameManager::GameManager() : m_player(m_window, sf::Vector2f(20, 20)) {
+	m_width = 0;
+	m_height = 0;
+	m_tileSize = 20;
+
+	m_player.setTexture(getTexture("player.png"));
+	m_player.setPosition(sf::Vector2f(20, 20));
 }
 
 GameManager::~GameManager() {
@@ -14,6 +18,19 @@ GameManager::~GameManager() {
 		}
 	}
 	m_gameObjects.clear();
+}
+
+const sf::Texture& GameManager::getTexture(const std::string& texturePath) {
+	// Check if the texture is already loaded
+	if (m_textures.find(texturePath) == m_textures.end()) {
+		// Load the texture and store it
+		sf::Texture texture;
+		if (!texture.loadFromFile(texturePath)) {
+			std::cerr << "Error loading texture: " << texturePath << "\n";
+		}
+		m_textures[texturePath] = std::move(texture);
+	}
+	return m_textures[texturePath];
 }
 
 void GameManager::draw()
@@ -27,19 +44,6 @@ void GameManager::draw()
 			}
 		}
 	}
-	//if (m_window.isOpen() && !m_gameObjects.empty())
-	//{
-	//	for (int i = 0; i < m_gameObjects.size(); i++)
-	//	{
-	//		if (!m_gameObjects[i].empty())
-	//		{
-	//			for (int j = 0; j < m_gameObjects[i].size(); j++)
-	//			{
-	//				m_gameObjects[i][j]->draw();
-	//			}
-	//		}
-	//	}
-	//}
 }
 
 void GameManager::drawLevel(const std::string& fileName)
@@ -82,53 +86,23 @@ void GameManager::drawLevel(const std::string& fileName)
 			switch (tile) {
 			case '#':
 				gameObject = new GameObject(m_window, sf::Vector2f(col * m_tileSize, row * m_tileSize));
-				gameObject->setTexture("wall.png");
+				gameObject->setTexture(getTexture("wall.png"));
 				break;
 			case 'R':
 				gameObject = new GameObject(m_window, sf::Vector2f(col * m_tileSize, row * m_tileSize));
-				gameObject->setTexture("rock.png");
+				gameObject->setTexture(getTexture("rock.png"));
 				break;
 			case 'D':
 				gameObject = new GameObject(m_window, sf::Vector2f(col * m_tileSize, row * m_tileSize));
-				gameObject->setTexture("door.png");
+				gameObject->setTexture(getTexture("door.png"));
 				break;
+			default:
+				break; // Leave the pointer as nullptr for empty spaces
 			}
 
 			m_gameObjects[row][col] = gameObject;
 		}
 	}
-
- //   // Parse the file and draw the window
- //   int row = 1;
-
-	//while (std::getline(file, line)) 
-	//{
-	//	m_gameObjects[row].resize(m_height);
-	//	for (int col = 0; col < line.size(); ++col)
-	//	{
-	//		char tile = line[col];
-	//		GameObject* gameObject = nullptr;
-	//		
-	//			switch (tile)
-	//			{
-	//			case '#':
-	//				gameObject = new GameObject(m_window, sf::Vector2f(col * m_tileSize, row * m_tileSize));
-	//				gameObject->setTexture("wall.png");
-	//				break;
-	//			case 'R':
-	//				gameObject = new GameObject(m_window, sf::Vector2f(col * m_tileSize, row * m_tileSize));
-	//				gameObject->setTexture("rock.png");
-	//				break;
-	//			case 'D':
-	//				gameObject = new GameObject(m_window, sf::Vector2f(col * m_tileSize, row * m_tileSize));
-	//				gameObject->setTexture("door.png");
-	//				break;
-	//			}
-	//			m_gameObjects[row][col] = gameObject;
-	//		}
-	//	
-	//	row++;
-	//}
 }
 
 void GameManager::runGame()
@@ -138,7 +112,6 @@ void GameManager::runGame()
     gameBackround.loadFromFile("gameBackround.png");
     sf::Sprite gameBackroundSprite(gameBackround);
 	//window
-	//m_window.create(sf::VideoMode(1000, 1000), "Bomberman");
 	drawLevel("level001.txt");
 	//m_window.setFramerateLimit(60);
 
@@ -151,41 +124,19 @@ void GameManager::runGame()
 			m_window.clear(sf::Color::White);
 			m_window.draw(gameBackroundSprite);
 			draw();
-
-			
-			/*for (int i = 1; i < m_gameObjects.size(); i++)
-			{
-				for (int j = 0; j < m_gameObjects[i].size(); j++)
-				{
-					m_gameObjects[i][j]->draw();
-				}
-			}*/
+			m_player.draw();
 			m_window.display();
+
 			switch (event.type)
 			{
 			case sf::Event::Closed:
 				m_window.close();
 				break;
-			/*case sf::Event::KeyPressed:
-				switch (event.key.code)
-				{
-				case sf::Keyboard::Up:
-					m_player.movePlayer(0, -1, m_board);
-					break;
-				case sf::Keyboard::Down:
-					m_player.movePlayer(0, 1, m_board);
-					break;
-				case sf::Keyboard::Left:
-					m_player.movePlayer(-1, 0, m_board);
-					break;
-				case sf::Keyboard::Right:
-					m_player.movePlayer(1, 0, m_board);
-					break;
-				}
-				break;*/
+			case sf::Event::KeyPressed:
+				m_player.move(event.key.code, &m_gameObjects);
+				break;
 			}
 		}
-
 	}
 }
 

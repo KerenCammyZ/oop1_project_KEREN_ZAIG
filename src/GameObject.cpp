@@ -1,7 +1,7 @@
 #include "GameObject.h"
 #include <iostream>
 
-GameObject::GameObject(sf::RenderWindow& window, sf::Vector2f position) : m_window(window), m_position(position), m_tileSize(20)
+GameObject::GameObject(sf::RenderWindow& window, sf::Vector2f position) : m_window(&window), m_position(position), m_tileSize(20)
 {
 	m_sprite.setPosition(m_position);
 }
@@ -9,7 +9,7 @@ GameObject::GameObject(sf::RenderWindow& window, sf::Vector2f position) : m_wind
 
 void GameObject::draw() const
 {	
-		m_window.draw(m_sprite);
+		m_window->draw(m_sprite);
 }
 
 sf::Vector2f GameObject::getPosition() const
@@ -27,7 +27,7 @@ sf::Texture GameObject::getTexture() const
 	return m_texture;
 }
 
-size_t GameObject::getTileSize() const
+int GameObject::getTileSize() const
 {
 	return m_tileSize;
 }
@@ -38,20 +38,12 @@ void GameObject::setPosition(const sf::Vector2f& position)
 	m_sprite.setPosition(position);
 }
 
-void GameObject::setTexture(const std::string& texturePath)
-{
-	if (m_texture.loadFromFile(texturePath))
-	{
+void GameObject::setTexture(sf::Texture texturePath)
+{	
 		m_sprite.setTexture(m_texture);
-		m_name = texturePath;
-	}
-	else
-	{
-		std::cerr << "Error loading texture: " << texturePath << "\n";
-	}
 }
 
-void GameObject::setTileSize(size_t tileSize)
+void GameObject::setTileSize(int tileSize)
 {
 	m_tileSize = tileSize;
 }
