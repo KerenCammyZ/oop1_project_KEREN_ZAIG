@@ -18,10 +18,12 @@ public:
 	void setTileSize(size_t tileSize);
 	void setSprite(const sf::Sprite& sprite);
 	void setSpriteTexture(sf::Texture);
+	std::string getName() const;
 private:
 	sf::RenderWindow &m_window;
 	sf::Vector2f m_position = sf::Vector2f(0,0);
 	sf::Texture m_texture;
 	sf::Sprite m_sprite;
+	std::string m_name;
 	int m_tileSize;
 };

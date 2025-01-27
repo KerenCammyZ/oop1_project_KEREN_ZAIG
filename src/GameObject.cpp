@@ -43,6 +43,7 @@ void GameObject::setTexture(const std::string& texturePath)
 	if (m_texture.loadFromFile(texturePath))
 	{
 		m_sprite.setTexture(m_texture);
+		m_name = texturePath;
 	}
 	else
 	{
@@ -63,6 +64,11 @@ void GameObject::setSprite(const sf::Sprite& sprite)
 void GameObject::setSpriteTexture(sf::Texture)
 {
 	m_sprite.setTexture(m_texture);
+}
+
+std::string GameObject::getName() const
+{
+	return m_name;
 }
 
 
