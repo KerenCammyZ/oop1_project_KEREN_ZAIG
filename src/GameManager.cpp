@@ -125,6 +125,26 @@ void GameManager::runGame()
 	drawLevel("level001.txt");
 	m_window.setFramerateLimit(60);
 
+	//add toolbar
+	sf::Font font;
+	if (!font.loadFromFile("Orange Kid.otf"))
+	{
+		std::cerr << "Cannot load font\n";
+	}
+
+	sf::Text lives, score, level, help, exit;
+
+	lives.setFont(font);
+	score.setFont(font);
+	level.setFont(font);
+	help.setFont(font);
+	exit.setFont(font);
+
+	lives.setFillColor(sf::Color::Black);
+	
+	
+
+	//add clock
 	sf::Clock clock;
 
 	// Main game loop
