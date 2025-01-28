@@ -9,7 +9,8 @@ MovingObject::MovingObject()
 
 void MovingObject::move(sf::Time deltaTime)
 {
-	const auto speedPerSecond = 40.f;
+	float speed = getTileSize();
+	const auto speedPerSecond = speed; 
 	moveSprite(m_direction * speedPerSecond * deltaTime.asSeconds());
 }
 

@@ -1,7 +1,7 @@
 #include "GameObject.h"
 #include <iostream>
 
-GameObject::GameObject(sf::RenderWindow& window, sf::Vector2f position) : m_window(&window), m_position(position), m_tileSize(40)
+GameObject::GameObject(sf::RenderWindow& window, sf::Vector2f position) : m_window(&window), m_position(position), m_tileSize(80)
 {
 	m_sprite.setPosition(m_position);
 }

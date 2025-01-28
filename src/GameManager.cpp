@@ -4,10 +4,10 @@
 GameManager::GameManager() : m_player(m_window, sf::Vector2f(40, 40)) {
 	m_width = 0;
 	m_height = 0;
-	m_tileSize = 40;
+	m_tileSize = 80;
 
 	m_player.setTexture(loadTexture("player.png"));
-	m_player.setPosition(sf::Vector2f(40, 40));
+	m_player.setPosition(sf::Vector2f(m_tileSize, m_tileSize));
 }
 
 GameManager::~GameManager() {

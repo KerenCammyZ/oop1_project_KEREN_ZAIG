@@ -6,5 +6,5 @@ Player::Player(sf::RenderWindow& window, sf::Vector2f position)
 }
 
 Player::Player() : MovingObject(), m_lives(3), m_score(0), m_alive(true) {
-	setPosition(sf::Vector2f(40, 40));
+	setPosition(sf::Vector2f(getTileSize(), getTileSize()));
 }
