@@ -25,4 +25,5 @@ private:
 	int m_width, m_height;
 	std::unordered_map<std::string, sf::Texture> m_textures;
 	Player m_player;
+	std::vector<Guard*> m_guards;
 };

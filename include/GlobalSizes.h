@@ -1,2 +1,2 @@
 #pragma once
-int m_tileSize = 80;
+constexpr int m_tileSize = 80;

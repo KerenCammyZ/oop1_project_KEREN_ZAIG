@@ -1,31 +1,60 @@
-#include "MovingObject.h"
+#include <cstdlib>
+#include <ctime>
+#include "Guard.h"
 
-MovingObject::MovingObject(sf::RenderWindow& window, sf::Vector2f position) : GameObject(window, position){}
-
-MovingObject::MovingObject()
+Guard::Guard(sf::RenderWindow& window, sf::Vector2f position)
+	: MovingObject(window, position)
 {
-	m_direction = sf::Vector2f(0, 0);
+	m_alive = true;
 }
 
-
-void MovingObject::moveSprite(const sf::Vector2f& offset)
+sf::Vector2f Guard::findPlayerDirection(const sf::Vector2f& playerPosition)
 {
-	m_sprite.move(offset);
+	// Calculate the direction vector in 2D
+	sf::Vector2f direction = playerPosition - m_position;
+
+	// Normalize the direction vector
+	float magnitude = std::sqrt(direction.x * direction.x + direction.y * direction.y);
+
+	if (magnitude != 0.f) {
+		direction /= magnitude; // Normalize to a unit vector
+	}
+
+	return direction; // Return the normalized direction as a 2D vector
+	
 }
 
-void MovingObject::move(sf::Time deltaTime, const std::vector<std::vector<GameObject*>>& m_board)
+void Guard::changeDirection()
+{
+    // Generate a random direction (up, down, left, or right)
+    int randomChoice = rand() % 4;  // Random number between 0 and 3
+
+    switch (randomChoice) {
+    case 0: m_currentDirection = sf::Vector2f(0, -1); break;  // Up
+    case 1: m_currentDirection = sf::Vector2f(0, 1); break;   // Down
+    case 2: m_currentDirection = sf::Vector2f(-1, 0); break;  // Left
+    case 3: m_currentDirection = sf::Vector2f(1, 0); break;   // Right
+    }
+}
+
+void Guard::move(sf::Time deltaTime, const std::vector<std::vector<GameObject*>>& m_board)
 {
     const auto speedPerSecond = static_cast<float>(m_tileSize);
 
-    // Calculate intended movement
-    sf::Vector2f movement = m_direction * speedPerSecond * deltaTime.asSeconds();
+    // Check if it's time to change direction
+    if (m_directionChangeClock.getElapsedTime().asSeconds() > rand() % 5 + 2) { // Random time between 2 and 6 seconds
+        changeDirection();  // Change direction after random time
+        m_directionChangeClock.restart();  // Reset the clock
+    }
+
+    // Calculate movement based on the current random direction
+    sf::Vector2f movement = m_currentDirection * speedPerSecond * deltaTime.asSeconds();
 
     // Predict the new position of the sprite
     sf::FloatRect predictedBounds = m_sprite.getGlobalBounds();
     predictedBounds.left += movement.x;
     predictedBounds.top += movement.y;
 
-    // Flag to determine if movement is allowed
     bool canMove = true;
 
     // Check for collisions
@@ -52,7 +81,6 @@ void MovingObject::move(sf::Time deltaTime, const std::vector<std::vector<GameOb
                                 movement.x = 0; // Disable horizontal movement
                             }
                         }
-                        // Block further checks for this object
                         canMove = false;
                     }
                 }
@@ -60,43 +88,9 @@ void MovingObject::move(sf::Time deltaTime, const std::vector<std::vector<GameOb
         }
     }
 
-    // Apply the resolved movement if no collision blocks it
-    if (canMove || movement != sf::Vector2f(0, 0)) {
+    // If no collision, move the guard
+    if (canMove) {
         moveSprite(movement);
     }
-
-    // Reset direction if movement is blocked for too long
-    if (m_direction != sf::Vector2f(0, 0) && m_movementTimer.getElapsedTime().asSeconds() > m_maxMovementTime) {
-        m_direction = sf::Vector2f(0, 0);
-    }
 }
 
-void MovingObject::setDirection(sf::Keyboard::Key key)
-{
-	switch (key)
-	{
-	case sf::Keyboard::Space:
-		m_direction = sf::Vector2f(0, 0);
-		break;
-	case sf::Keyboard::Key::Left:
-		m_direction = sf::Vector2f(-1, 0);
-		break;
-	case sf::Keyboard::Key::Right:
-		m_direction = sf::Vector2f(1, 0);
-		break;
-	case sf::Keyboard::Key::Up:
-		m_direction = sf::Vector2f(0, -1);
-		break;
-	case sf::Keyboard::Key::Down:
-		m_direction = sf::Vector2f(0, 1);
-		break;
-	default:
-		break;
-	}
-
-	// Reset the movement timer when a new direction is set
-	if (m_direction != sf::Vector2f(0, 0)) 
-	{
-		m_movementTimer.restart(); // Restart the timer
-	}
-}

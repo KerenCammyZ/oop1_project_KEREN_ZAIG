@@ -49,7 +49,17 @@ std::string GameObject::getName() const
 	return m_name;
 }
 
-void GameObject::moveSprite(const sf::Vector2f& offset)
+sf::FloatRect GameObject::getBounds() const
 {
-	m_sprite.move(offset);
+	return m_sprite.getGlobalBounds();
+}
+
+std::string GameObject::getType() const 
+{
+	return m_type;
+}
+
+void GameObject::setType(const std::string& type)
+{
+	m_type = type;
 }

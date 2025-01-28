@@ -1,5 +1,5 @@
 #include "GameManager.h"
-
+#include "Guard.h"
 
 GameManager::GameManager() : m_player(m_window, sf::Vector2f(m_tileSize, m_tileSize)) {
 	m_width = 0;
@@ -87,14 +87,23 @@ void GameManager::drawLevel(const std::string& fileName)
 			case '#':
 				gameObject = new GameObject(m_window, sf::Vector2f(col * m_tileSize, row * m_tileSize));
 				gameObject->setTexture(loadTexture("wall.png"));
+				gameObject->setType("wall");
 				break;
 			case '@':
 				gameObject = new GameObject(m_window, sf::Vector2f(col * m_tileSize, row * m_tileSize));
 				gameObject->setTexture(loadTexture("rock.png"));
+				gameObject->setType("rock");
 				break;
 			case 'D':
 				gameObject = new GameObject(m_window, sf::Vector2f(col * m_tileSize, row * m_tileSize));
 				gameObject->setTexture(loadTexture("door.png"));
+				gameObject->setType("door");
+				break;
+			case '!':
+				gameObject = new Guard(m_window, sf::Vector2f(col * m_tileSize, row * m_tileSize));
+				gameObject->setTexture(loadTexture("guard.png"));
+				gameObject->setType("guard");
+				m_guards.push_back(dynamic_cast<Guard*>(gameObject));
 				break;
 			default:
 				break;
@@ -142,8 +151,10 @@ void GameManager::runGame()
 		}
 
 		// Update game state
-		m_player.move(deltaTime);
-
+		m_player.move(deltaTime, m_board);
+		for (auto& guard : m_guards) {
+			guard->move(deltaTime, m_board);
+		}
 		// Render the scene
 		m_window.clear(sf::Color::White);
 		draw();          //draw level objects
