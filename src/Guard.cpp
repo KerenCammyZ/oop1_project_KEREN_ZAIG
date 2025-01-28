@@ -38,7 +38,7 @@ void Guard::changeDirection(const Player player)
     }
 }
 
-void Guard::moveGuard(sf::Time deltaTime, const std::vector<std::vector<GameObject*>>& m_board, const Player player)
+void Guard::moveGuard(sf::Time deltaTime, const std::vector<std::vector<GameObject*>>& m_board, Player &player)
 {
     const auto speedPerSecond = static_cast<float>(m_tileSize);
 
@@ -59,14 +59,17 @@ void Guard::moveGuard(sf::Time deltaTime, const std::vector<std::vector<GameObje
     bool canMove = true;
 
     // Check for collisions
-    for (const auto& row : m_board) {
-        for (const auto& obj : row) {
+    for (const auto& row : m_board) 
+    {
+        for (const auto& obj : row) 
+        {
             if (obj) {
                 sf::FloatRect objectBounds = obj->getBounds();
 
                 // Check for collision with the object
                 if (objectBounds.intersects(predictedBounds)) {
-                    if (obj->getType() == "wall" || obj->getType() == "rock") {
+                    if (obj->getType() == "wall" || obj->getType() == "rock") 
+                    {
                         // Resolve the collision by adjusting the movement
                         sf::FloatRect intersection;
                         if (predictedBounds.intersects(objectBounds, intersection)) {
@@ -89,9 +92,14 @@ void Guard::moveGuard(sf::Time deltaTime, const std::vector<std::vector<GameObje
         }
     }
 
+
     // If no collision, move the guard
     if (canMove) {
         moveSprite(movement);
     }
+
+    //if collision with player, lose life
+    if (m_sprite.getGlobalBounds().intersects(player.getBounds()))
+        player.lostLife();
 }
 

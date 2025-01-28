@@ -15,17 +15,19 @@ public:
 	~GameManager();
 	const sf::Texture& loadTexture(const std::string& texturePath);
 	void runGame();
-	void draw();
-	//bool openPlaylist();
-	void drawLevel(const std::string& fileName);
-
+	void drawBoard();
+	void drawLevel(int currLevel);
+	void mainMenuScreen();
+	void toolbar();
+	void drawToolbar();
 private:
 	std::vector<std::vector<GameObject*>> m_board;
 	sf::RenderWindow m_window;
-	int m_width, m_height;
+	int m_width = 0, m_height = 0, m_currLevel = 0;
+	const int m_numOfLevels = 3;
 	std::unordered_map<std::string, sf::Texture> m_textures;
 	Player m_player;
 	std::vector<Guard*> m_guards;
-	sf::Text lives, score, level, help, exit;
-
+	sf::Text m_livesText, m_scoreText, m_levelText, m_helpText, m_exitText;
+	sf::Font m_font;
 };

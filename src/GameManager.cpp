@@ -5,6 +5,10 @@ GameManager::GameManager() : m_player(m_window, sf::Vector2f(m_tileSize, m_tileS
 	m_width = 0;
 	m_height = 0;
 
+	if (!m_font.loadFromFile("Orange Kid.otf")) {
+		std::cerr << "Error: Cannot load font 'Orange Kid.otf'\n";
+	}
+
 	m_player.setTexture(loadTexture("player.png"));
 	m_player.setPosition(sf::Vector2f(m_tileSize, m_tileSize));
 }
@@ -32,7 +36,7 @@ const sf::Texture& GameManager::loadTexture(const std::string& texturePath) {
 	return m_textures[texturePath];
 }
 
-void GameManager::draw()
+void GameManager::drawBoard()
 {
 	if (m_window.isOpen() && !m_board.empty()) {
 		for (const auto& row : m_board) {
@@ -45,8 +49,9 @@ void GameManager::draw()
 	}
 }
 
-void GameManager::drawLevel(const std::string& fileName)
+void GameManager::drawLevel(int level)
 {
+	std::string fileName = "level" + std::to_string(level) + ".txt";
     std::ifstream file(fileName);
     if (!file) {
         std::cerr << "Cannot open level file: " << fileName << "\n";
@@ -85,22 +90,22 @@ void GameManager::drawLevel(const std::string& fileName)
 			switch (tile) {
 			
 			case '#':
-				gameObject = new GameObject(m_window, sf::Vector2f(col * m_tileSize, row * m_tileSize));
+				gameObject = new GameObject(m_window, sf::Vector2f(col * m_tileSize, m_tileSize + row * m_tileSize));
 				gameObject->setTexture(loadTexture("wall.png"));
 				gameObject->setType("wall");
 				break;
 			case '@':
-				gameObject = new GameObject(m_window, sf::Vector2f(col * m_tileSize, row * m_tileSize));
+				gameObject = new GameObject(m_window, sf::Vector2f(col * m_tileSize, m_tileSize + row * m_tileSize));
 				gameObject->setTexture(loadTexture("rock.png"));
 				gameObject->setType("rock");
 				break;
 			case 'D':
-				gameObject = new GameObject(m_window, sf::Vector2f(col * m_tileSize, row * m_tileSize));
+				gameObject = new GameObject(m_window, sf::Vector2f(col * m_tileSize, m_tileSize + row * m_tileSize));
 				gameObject->setTexture(loadTexture("door.png"));
 				gameObject->setType("door");
 				break;
 			case '!':
-				gameObject = new Guard(m_window, sf::Vector2f(col * m_tileSize, row * m_tileSize));
+				gameObject = new Guard(m_window, sf::Vector2f(col * m_tileSize, m_tileSize + row * m_tileSize));
 				gameObject->setTexture(loadTexture("guard.png"));
 				gameObject->setType("guard");
 				m_guards.push_back(dynamic_cast<Guard*>(gameObject));
@@ -119,41 +124,108 @@ void GameManager::drawLevel(const std::string& fileName)
 	}
 }
 
-void GameManager::runGame() 
+void GameManager::mainMenuScreen()
 {
-	// Load level
-	drawLevel("level001.txt");
-	m_window.setFramerateLimit(60);
-
-	//add toolbar
+	int menuSize = 500;
+	m_window.create(sf::VideoMode(menuSize, menuSize), "Bomberman");
 	sf::Font font;
 	if (!font.loadFromFile("Orange Kid.otf"))
 	{
 		std::cerr << "Cannot load font\n";
 	}
 
-	lives.setFont(font);
-	score.setFont(font);
-	level.setFont(font);
-	help.setFont(font);
-	exit.setFont(font);
+	sf::Text play;
+	play.setFont(font);
+	play.setFillColor(sf::Color::Black);
+	play.setString("PLAY");
+	play.setCharacterSize(150);
+	int centerX = (menuSize / 2) - play.getGlobalBounds().width / 2;
+	int centerY = (menuSize / 2) - play.getGlobalBounds().height;
+	play.setPosition(sf::Vector2f(centerX,centerY - 20));
 
-	lives.setFillColor(sf::Color::Black);
-	score.setFillColor(sf::Color::Black);
-	level.setFillColor(sf::Color::Black);
-	help.setFillColor(sf::Color::Black);
-	exit.setFillColor(sf::Color::Black);
-
-	int toolbarY = m_height - m_tileSize - 2;
-	int toolbarX = 0;
-	lives.setPosition(sf::Vector2f(toolbarX, toolbarY));
-
-	lives.setCharacterSize(70);
-
-
-	lives.setString("Lives: ");
 	
+	while (m_window.isOpen())
+	{
+		sf::Event event;
+		while (m_window.pollEvent(event)) 
+		{
+			switch (event.type) 
+			{
+			case sf::Event::Closed:
+				m_window.close();
+				break;
+			default:
+				break;
+			}
+		}
 
+		m_window.clear(sf::Color::White);
+		m_window.draw(play);
+		m_window.display();
+	}
+}
+
+void GameManager::toolbar()
+{
+	m_livesText.setFont(m_font);
+	m_scoreText.setFont(m_font);
+	m_levelText.setFont(m_font);
+	m_helpText.setFont(m_font);
+	m_exitText.setFont(m_font);
+
+	m_livesText.setFillColor(sf::Color::Black);
+	m_scoreText.setFillColor(sf::Color::Black);
+	m_levelText.setFillColor(sf::Color::Black);
+	m_helpText.setFillColor(sf::Color::Black);
+	m_exitText.setFillColor(sf::Color::Black);
+
+	m_livesText.setCharacterSize(70);
+	m_scoreText.setCharacterSize(70);
+	m_levelText.setCharacterSize(70);
+	m_helpText.setCharacterSize(70);
+	m_exitText.setCharacterSize(70);
+
+	int toolbarY = 2;
+	int toolbarX = 0;
+	m_levelText.setPosition(sf::Vector2f(toolbarX, toolbarY));
+	m_livesText.setPosition(sf::Vector2f(toolbarX + (5 *m_tileSize), toolbarY));
+	m_scoreText.setPosition(sf::Vector2f(toolbarX + (10 * m_tileSize), toolbarY));
+	m_helpText.setPosition(sf::Vector2f(toolbarX + (15 * m_tileSize), toolbarY));
+	m_exitText.setPosition(sf::Vector2f(toolbarX + (20 * m_tileSize), toolbarY));
+
+}
+
+void GameManager::drawToolbar()
+{
+	if (m_livesText.getFont() == nullptr) {
+		return;
+	}
+	if (!m_window.isOpen()) {
+		return;
+	}
+	m_livesText.setString("Lives: " + std::to_string(m_player.getLives()));
+	m_scoreText.setString("Score: " + std::to_string(m_player.getScore()));
+	m_levelText.setString("Level: " + std::to_string(m_currLevel));
+	m_helpText.setString("Help");
+	m_exitText.setString("Exit");
+
+	m_window.draw(m_livesText);
+	m_window.draw(m_scoreText);
+	m_window.draw(m_levelText);
+	m_window.draw(m_helpText);
+	m_window.draw(m_exitText);
+}
+
+void GameManager::runGame() 
+{
+	// Load level
+	m_currLevel = 1;
+	drawLevel(m_currLevel);
+	m_window.setFramerateLimit(60);
+
+	//add toolbar
+	toolbar();
+	
 	//add clock
 	sf::Clock clock;
 
@@ -185,11 +257,12 @@ void GameManager::runGame()
 		for (auto& guard : m_guards) {
 			guard->moveGuard(deltaTime, m_board, m_player);
 		}
+
 		// Render the scene
 		m_window.clear(sf::Color::White);
-		draw();          //draw level objects
+		drawBoard();
 		m_player.draw(); 
-		m_window.draw(lives);
+		drawToolbar();
 		m_window.display();
 	}
 }

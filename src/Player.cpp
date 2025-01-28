@@ -13,5 +13,19 @@ Player::Player() : MovingObject(), m_lives(3), m_score(0), m_alive(true) {
 
 void Player::lostLife()
 {
-    m_lives--;
+    if (m_lives > 0)
+    {
+        m_lives--;
+        respawn();
+    }
+    if (m_lives == 0) //game over
+    {
+        m_alive = false;
+        return;
+    }
+}
+
+void Player::respawn()
+{
+    setPosition(sf::Vector2f(m_tileSize, m_tileSize));
 }
