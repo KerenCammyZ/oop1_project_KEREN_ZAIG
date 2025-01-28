@@ -153,7 +153,7 @@ void GameManager::runGame()
 		// Update game state
 		m_player.move(deltaTime, m_board);
 		for (auto& guard : m_guards) {
-			guard->move(deltaTime, m_board);
+			guard->moveGuard(deltaTime, m_board, m_player);
 		}
 		// Render the scene
 		m_window.clear(sf::Color::White);

@@ -6,9 +6,9 @@ class Guard : public MovingObject
 {
 public:
 	Guard(sf::RenderWindow& window, sf::Vector2f position);
-	void move(sf::Time deltaTime, const std::vector<std::vector<GameObject*>>& m_board) override;
+	void moveGuard(sf::Time deltaTime, const std::vector<std::vector<GameObject*>>& m_board, const Player player);
 	sf::Vector2f findPlayerDirection(const sf::Vector2f& playerPosition);
-	void changeDirection();
+	void changeDirection(const Player player);
 private:
 	bool m_alive;
 	sf::Clock m_directionChangeClock;  // Timer to track the direction change
