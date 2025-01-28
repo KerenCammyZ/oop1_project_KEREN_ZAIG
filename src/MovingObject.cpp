@@ -9,7 +9,12 @@ MovingObject::MovingObject()
 
 void MovingObject::move(sf::Time deltaTime)
 {
-	const auto speedPerSecond = 40.f;
+	if (m_direction != sf::Vector2f(0, 0) && m_movementTimer.getElapsedTime().asSeconds() > m_maxMovementTime) 
+	{
+		m_direction = sf::Vector2f(0, 0); // Stop movement after 5 seconds
+		return;
+	}
+	const auto speedPerSecond = (float)(m_tileSize);
 	moveSprite(m_direction * speedPerSecond * deltaTime.asSeconds());
 }
 
@@ -35,30 +40,10 @@ void MovingObject::setDirection(sf::Keyboard::Key key)
 	default:
 		break;
 	}
-}
 
-//bool MovingObject::canMove(sf::Vector2f newPosition, std::vector<std::vector<GameObject*>>* m_gameObjects)
-//{
-//	// Calculate row and column based on the new position
-//	int row = static_cast<int>(newPosition.y / getTileSize());
-//	int col = static_cast<int>(newPosition.x / getTileSize());
-//
-//	// Check if the position is out of bounds
-//	if (row < 0 || row >= m_gameObjects->size() || col < 0 || col >= (*m_gameObjects)[row].size()) {
-//		return false; // Out of bounds
-//	}
-//
-//	// Check if the object at the new position is null
-//	GameObject* targetObject = (*m_gameObjects)[row][col];
-//	if (!targetObject) {
-//		return true; // Empty space
-//	}
-//
-//	// Check the name of the object
-//	std::string newPositionName = targetObject->getName();
-//	if (newPositionName == "Guard.png" || newPositionName == "Wall.png") {
-//		return false; // Cannot move into guards or walls
-//	}
-//
-//	return true; // All other tiles are passable	
-//}
+	// Reset the movement timer when a new direction is set
+	if (m_direction != sf::Vector2f(0, 0)) 
+	{
+		m_movementTimer.restart(); // Restart the timer
+	}
+}

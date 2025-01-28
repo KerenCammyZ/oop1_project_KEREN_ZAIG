@@ -7,6 +7,7 @@
 #include "GameObject.h"
 #include "Player.h"
 #include <unordered_map>
+#include "GlobalSizes.h"
 
 class GameManager {
 public:
@@ -21,7 +22,6 @@ public:
 private:
 	std::vector<std::vector<GameObject*>> m_board;
 	sf::RenderWindow m_window;
-	int m_tileSize;
 	int m_width, m_height;
 	std::unordered_map<std::string, sf::Texture> m_textures;
 	Player m_player;
