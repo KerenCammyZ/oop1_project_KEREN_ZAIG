@@ -26,4 +26,6 @@ private:
 	std::unordered_map<std::string, sf::Texture> m_textures;
 	Player m_player;
 	std::vector<Guard*> m_guards;
+	sf::Text lives, score, level, help, exit;
+
 };

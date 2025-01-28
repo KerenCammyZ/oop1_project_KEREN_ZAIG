@@ -26,7 +26,6 @@ sf::Vector2f Guard::findPlayerDirection(const sf::Vector2f& playerPosition)
 
 void Guard::changeDirection(const Player player)
 {
-    // Generate a random direction (up, down, left, or right)
     int randomChoice = rand() % 2;  // Random number between 0 and 1
 
     switch (randomChoice) {
@@ -44,7 +43,7 @@ void Guard::moveGuard(sf::Time deltaTime, const std::vector<std::vector<GameObje
     const auto speedPerSecond = static_cast<float>(m_tileSize);
 
     // Check if it's time to change direction
-    if (m_directionChangeClock.getElapsedTime().asSeconds() > rand() % 5 + 2) { // Random time between 2 and 6 seconds
+    if (m_directionChangeClock.getElapsedTime().asSeconds() > rand() % 3 + 2) { // Random time between 2 and 6 seconds
         changeDirection(player);  // Change direction after random time
         m_directionChangeClock.restart();  // Reset the clock
     }

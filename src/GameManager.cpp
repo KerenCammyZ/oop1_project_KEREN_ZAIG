@@ -132,8 +132,6 @@ void GameManager::runGame()
 		std::cerr << "Cannot load font\n";
 	}
 
-	sf::Text lives, score, level, help, exit;
-
 	lives.setFont(font);
 	score.setFont(font);
 	level.setFont(font);
@@ -141,7 +139,19 @@ void GameManager::runGame()
 	exit.setFont(font);
 
 	lives.setFillColor(sf::Color::Black);
-	
+	score.setFillColor(sf::Color::Black);
+	level.setFillColor(sf::Color::Black);
+	help.setFillColor(sf::Color::Black);
+	exit.setFillColor(sf::Color::Black);
+
+	int toolbarY = m_height - m_tileSize - 2;
+	int toolbarX = 0;
+	lives.setPosition(sf::Vector2f(toolbarX, toolbarY));
+
+	lives.setCharacterSize(70);
+
+
+	lives.setString("Lives: ");
 	
 
 	//add clock
@@ -179,6 +189,7 @@ void GameManager::runGame()
 		m_window.clear(sf::Color::White);
 		draw();          //draw level objects
 		m_player.draw(); 
+		m_window.draw(lives);
 		m_window.display();
 	}
 }
