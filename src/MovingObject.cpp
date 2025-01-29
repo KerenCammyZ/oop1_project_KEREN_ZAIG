@@ -7,11 +7,68 @@ MovingObject::MovingObject()
 	m_direction = sf::Vector2f(0, 0);
 }
 
-void MovingObject::move(sf::Time deltaTime)
+
+void MovingObject::moveSprite(const sf::Vector2f& offset)
 {
-	float speed = getTileSize();
-	const auto speedPerSecond = speed; 
-	moveSprite(m_direction * speedPerSecond * deltaTime.asSeconds());
+	m_sprite.move(offset);
+}
+
+void MovingObject::move(sf::Time deltaTime, const std::vector<std::vector<GameObject*>>& m_board)
+{
+    const auto speedPerSecond = static_cast<float>(m_tileSize);
+
+    // Calculate intended movement
+    sf::Vector2f movement = m_direction * speedPerSecond * deltaTime.asSeconds();
+
+    // Predict the new position of the sprite
+    sf::FloatRect predictedBounds = m_sprite.getGlobalBounds();
+    predictedBounds.left += movement.x;
+    predictedBounds.top += movement.y;
+
+    // Flag to determine if movement is allowed
+    bool canMove = true;
+
+    // Check for collisions
+    for (const auto& row : m_board) {
+        for (const auto& obj : row) {
+            if (obj) {
+                sf::FloatRect objectBounds = obj->getBounds();
+
+                // Check for collision with the object
+                if (objectBounds.intersects(predictedBounds)) {
+                    if (obj->getType() == "wall" || obj->getType() == "rock") {
+                        // Resolve the collision by adjusting the movement
+                        sf::FloatRect intersection;
+                        if (predictedBounds.intersects(objectBounds, intersection)) {
+                            // Determine the smallest overlap to resolve the collision
+                            if (intersection.width < intersection.height) {
+                                // Horizontal collision
+                                movement.x = (predictedBounds.left < objectBounds.left ? -intersection.width : intersection.width);
+                                movement.y = 0; // Disable vertical movement
+                            }
+                            else {
+                                // Vertical collision
+                                movement.y = (predictedBounds.top < objectBounds.top ? -intersection.height : intersection.height);
+                                movement.x = 0; // Disable horizontal movement
+                            }
+                        }
+                        // Block further checks for this object
+                        canMove = false;
+                    }
+                }
+            }
+        }
+    }
+
+    // Apply the resolved movement if no collision blocks it
+    if (canMove || movement != sf::Vector2f(0, 0)) {
+        moveSprite(movement);
+    }
+
+    // Reset direction if movement is blocked for too long
+    if (m_direction != sf::Vector2f(0, 0) && m_movementTimer.getElapsedTime().asSeconds() > m_maxMovementTime) {
+        m_direction = sf::Vector2f(0, 0);
+    }
 }
 
 void MovingObject::setDirection(sf::Keyboard::Key key)
@@ -36,30 +93,10 @@ void MovingObject::setDirection(sf::Keyboard::Key key)
 	default:
 		break;
 	}
-}
 
-//bool MovingObject::canMove(sf::Vector2f newPosition, std::vector<std::vector<GameObject*>>* m_gameObjects)
-//{
-//	// Calculate row and column based on the new position
-//	int row = static_cast<int>(newPosition.y / getTileSize());
-//	int col = static_cast<int>(newPosition.x / getTileSize());
-//
-//	// Check if the position is out of bounds
-//	if (row < 0 || row >= m_gameObjects->size() || col < 0 || col >= (*m_gameObjects)[row].size()) {
-//		return false; // Out of bounds
-//	}
-//
-//	// Check if the object at the new position is null
-//	GameObject* targetObject = (*m_gameObjects)[row][col];
-//	if (!targetObject) {
-//		return true; // Empty space
-//	}
-//
-//	// Check the name of the object
-//	std::string newPositionName = targetObject->getName();
-//	if (newPositionName == "Guard.png" || newPositionName == "Wall.png") {
-//		return false; // Cannot move into guards or walls
-//	}
-//
-//	return true; // All other tiles are passable	
-//}
+	// Reset the movement timer when a new direction is set
+	if (m_direction != sf::Vector2f(0, 0)) 
+	{
+		m_movementTimer.restart(); // Restart the timer
+	}
+}

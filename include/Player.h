@@ -5,6 +5,10 @@ class Player : public MovingObject{
 public:
 	Player(sf::RenderWindow& window, sf::Vector2f position);
 	Player();	
+	void lostLife();
+	int getLives() const { return m_lives; }
+	int getScore() const { return m_score; }
+	void respawn();
 private:
 	int m_lives = 3;
 	int m_score = 0;
