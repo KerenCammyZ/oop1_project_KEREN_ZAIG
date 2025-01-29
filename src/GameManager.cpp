@@ -228,6 +228,36 @@ void GameManager::drawToolbar()
 	m_window.draw(m_timeText);
 }
 
+void GameManager::drawBombs(std::vector<Bomb*>& m_bombs)
+{
+	for (int i = 0; i < m_bombs.size(); i++)
+	{
+		int currTime = m_bombs[i]->getCount();
+		switch (currTime)
+		{
+		case 0:
+			m_bombs[i]->setTexture(loadTexture("bomb1.png"));
+			break;
+		case 1:
+			m_bombs[i]->setTexture(loadTexture("bomb1.png"));
+			break;
+		case 2:
+			m_bombs[i]->setTexture(loadTexture("bomb2.png"));
+			break;
+		case 3:
+			m_bombs[i]->setTexture(loadTexture("bomb3.png"));
+			break;
+		case 4:
+			m_bombs[i]->setTexture(loadTexture("bomb4.png"));
+			break;
+		default:
+			std::cerr << "Bomb Error\n";
+			break;
+		}
+		m_bombs[i]->draw();
+	}
+}
+
 void GameManager::runGame() 
 {
 	// Load level
@@ -255,6 +285,11 @@ void GameManager::runGame()
 				break;
 
 			case sf::Event::KeyPressed:
+				if (event.key.code == sf::Keyboard::B)
+				{
+					m_bombs.push_back(new Bomb(m_window, m_player.getPosition()));
+				}
+				else
 				m_player.setDirection(event.key.code);
 				break;
 
@@ -273,6 +308,7 @@ void GameManager::runGame()
 		m_window.clear(sf::Color::White);
 		drawBoard();
 		m_player.draw(); 
+		drawBombs(m_bombs);
 		drawToolbar();
 		m_window.display();
 	}

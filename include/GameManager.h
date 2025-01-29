@@ -9,6 +9,7 @@
 #include <unordered_map>
 #include "GlobalSizes.h"
 #include "Guard.h"
+#include "Bomb.h"
 
 class GameManager {
 public:
@@ -21,6 +22,7 @@ public:
 	void mainMenuScreen();
 	void toolbar();
 	void drawToolbar();
+	void drawBombs(std::vector<Bomb*> &m_bombs);
 private:
 	std::vector<std::vector<GameObject*>> m_board;
 	sf::RenderWindow m_window;
@@ -32,4 +34,5 @@ private:
 	sf::Text m_livesText, m_scoreText, m_levelText, m_helpText, m_exitText, m_timeText;
 	sf::Font m_font;
 	sf::Clock m_clock;
+	std::vector<Bomb*> m_bombs;
 };
