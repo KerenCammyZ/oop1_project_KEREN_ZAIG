@@ -1,4 +1,5 @@
 #include "MovingObject.h"
+#include "Player.h"
 
 MovingObject::MovingObject(sf::RenderWindow& window, sf::Vector2f position) : GameObject(window, position){}
 
@@ -13,7 +14,7 @@ void MovingObject::moveSprite(const sf::Vector2f& offset)
 	m_sprite.move(offset);
 }
 
-void MovingObject::move(sf::Time deltaTime, const std::vector<std::vector<GameObject*>>& m_board)
+void MovingObject::move(sf::Time deltaTime, const std::vector<std::vector<GameObject*>>& m_board, Player &player)
 {
     const auto speedPerSecond = static_cast<float>(m_tileSize);
 

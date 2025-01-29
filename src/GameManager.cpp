@@ -172,26 +172,30 @@ void GameManager::toolbar()
 	m_levelText.setFont(m_font);
 	m_helpText.setFont(m_font);
 	m_exitText.setFont(m_font);
+	m_timeText.setFont(m_font);
 
 	m_livesText.setFillColor(sf::Color::Black);
 	m_scoreText.setFillColor(sf::Color::Black);
 	m_levelText.setFillColor(sf::Color::Black);
 	m_helpText.setFillColor(sf::Color::Black);
 	m_exitText.setFillColor(sf::Color::Black);
+	m_timeText.setFillColor(sf::Color::Black);
 
 	m_livesText.setCharacterSize(70);
 	m_scoreText.setCharacterSize(70);
 	m_levelText.setCharacterSize(70);
 	m_helpText.setCharacterSize(70);
 	m_exitText.setCharacterSize(70);
+	m_timeText.setCharacterSize(70);
 
 	int toolbarY = 2;
 	int toolbarX = 0;
 	m_levelText.setPosition(sf::Vector2f(toolbarX, toolbarY));
 	m_livesText.setPosition(sf::Vector2f(toolbarX + (5 *m_tileSize), toolbarY));
 	m_scoreText.setPosition(sf::Vector2f(toolbarX + (10 * m_tileSize), toolbarY));
-	m_helpText.setPosition(sf::Vector2f(toolbarX + (15 * m_tileSize), toolbarY));
-	m_exitText.setPosition(sf::Vector2f(toolbarX + (20 * m_tileSize), toolbarY));
+	m_timeText.setPosition(sf::Vector2f(toolbarX + (15 * m_tileSize), toolbarY));
+	m_helpText.setPosition(sf::Vector2f(toolbarX + (20 * m_tileSize), toolbarY));
+	m_exitText.setPosition(sf::Vector2f(toolbarX + (25 * m_tileSize), toolbarY));
 
 }
 
@@ -209,11 +213,19 @@ void GameManager::drawToolbar()
 	m_helpText.setString("Help");
 	m_exitText.setString("Exit");
 
+	int minutes = m_clock.getElapsedTime().asSeconds() / 60;
+	int seconds = int(m_clock.getElapsedTime().asSeconds()) % 60;
+	if(seconds < 10)
+		m_timeText.setString("Time: " + std::to_string(minutes) + ":0" + std::to_string(seconds));
+	else
+		m_timeText.setString("Time: " + std::to_string(minutes) + ":" + std::to_string(seconds));
+
 	m_window.draw(m_livesText);
 	m_window.draw(m_scoreText);
 	m_window.draw(m_levelText);
 	m_window.draw(m_helpText);
 	m_window.draw(m_exitText);
+	m_window.draw(m_timeText);
 }
 
 void GameManager::runGame() 
@@ -225,8 +237,7 @@ void GameManager::runGame()
 
 	//add toolbar
 	toolbar();
-	
-	//add clock
+
 	sf::Clock clock;
 
 	// Main game loop
@@ -253,9 +264,9 @@ void GameManager::runGame()
 		}
 
 		// Update game state
-		m_player.move(deltaTime, m_board);
+		m_player.move(deltaTime, m_board, m_player);
 		for (auto& guard : m_guards) {
-			guard->moveGuard(deltaTime, m_board, m_player);
+			guard->move(deltaTime, m_board, m_player);
 		}
 
 		// Render the scene

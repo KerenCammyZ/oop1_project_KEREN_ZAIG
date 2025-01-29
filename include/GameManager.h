@@ -8,6 +8,7 @@
 #include "Player.h"
 #include <unordered_map>
 #include "GlobalSizes.h"
+#include "Guard.h"
 
 class GameManager {
 public:
@@ -28,6 +29,7 @@ private:
 	std::unordered_map<std::string, sf::Texture> m_textures;
 	Player m_player;
 	std::vector<Guard*> m_guards;
-	sf::Text m_livesText, m_scoreText, m_levelText, m_helpText, m_exitText;
+	sf::Text m_livesText, m_scoreText, m_levelText, m_helpText, m_exitText, m_timeText;
 	sf::Font m_font;
+	sf::Clock m_clock;
 };

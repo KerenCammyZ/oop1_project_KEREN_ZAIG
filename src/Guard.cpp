@@ -1,6 +1,7 @@
 #include <cstdlib>
 #include <ctime>
 #include "Guard.h"
+#include "Player.h"
 
 Guard::Guard(sf::RenderWindow& window, sf::Vector2f position)
 	: MovingObject(window, position)
@@ -38,7 +39,7 @@ void Guard::changeDirection(const Player player)
     }
 }
 
-void Guard::moveGuard(sf::Time deltaTime, const std::vector<std::vector<GameObject*>>& m_board, Player &player)
+void Guard::move(sf::Time deltaTime, const std::vector<std::vector<GameObject*>>& m_board, Player &player)
 {
     const auto speedPerSecond = static_cast<float>(m_tileSize);
 
