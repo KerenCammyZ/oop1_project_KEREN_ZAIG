@@ -92,7 +92,7 @@ void GameManager::drawLevel(int level)
 			case '#':
 				gameObject = new GameObject(m_window, sf::Vector2f(col * m_tileSize, m_tileSize + row * m_tileSize));
 				gameObject->setTexture(loadTexture("wall.png"));
-				gameObject->setType("wall");
+				gameObject->setType(WALL);
 				break;
 			case '@':
 				gameObject = new GameObject(m_window, sf::Vector2f(col * m_tileSize, m_tileSize + row * m_tileSize));

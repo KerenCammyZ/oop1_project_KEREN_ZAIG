@@ -3,11 +3,11 @@
 #include "GlobalSizes.h"
 
 class GameObject {
-
 public:
+	//enum ObjectType { UNKNOWN, WALL, ROCK, PLAYER, BOMB };
 	virtual ~GameObject() = default; // Add virtual destructor
 	GameObject() = default;
-	GameObject(sf::RenderWindow &window, sf::Vector2f position);
+	GameObject(int x, int y, ObjectType type);
 	void draw() const;
 	sf::Vector2f getPosition() const;
 	sf::Sprite getSprite() const;
@@ -15,21 +15,23 @@ public:
 	void setPosition(const sf::Vector2f& position);
 	void setTexture(sf::Texture texturePath);
 	void setSprite(const sf::Sprite& sprite);
-	std::string getName() const;
 	sf::FloatRect getBounds() const;
-	std::string getType() const;
-	void setType(const std::string& type);
+	ObjectType getType() const;
+	void setType(ObjectType obj);
 	bool checkCollision(GameObject* a, GameObject* b);
+	int getX();
+	int getY();
+	int getWidth();
+	int getHeight();
 
-	enum ObjectType { UNKNOWN, WALL, ROCK, PLAYER, BOMB };
-
-private:
+protected:
 	sf::RenderWindow* m_window; // Change to pointer
-	sf::Vector2f m_position = sf::Vector2f(0,0);
+	sf::Vector2f m_position;
+	int m_x, m_y;
 	sf::Texture m_texture;
-	std::string m_name;
 	sf::Sprite m_sprite;
+	ObjectType m_type;
 
 	friend class MovingObject;
-	friend class Guard;
+	friend class StaticObject;
 };
