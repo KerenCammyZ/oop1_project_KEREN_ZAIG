@@ -230,33 +230,40 @@ void GameManager::drawToolbar()
 
 void GameManager::drawBombs(std::vector<Bomb*>& m_bombs)
 {
-	for (int i = 0; i < m_bombs.size(); i++)
+	if (m_bombs.empty())
+		return;
+	else
 	{
-		int currTime = m_bombs[i]->getCount();
-		switch (currTime)
+		for (int i = 0; i < m_bombs.size(); i++)
 		{
-		case 0:
-			m_bombs[i]->setTexture(loadTexture("bomb1.png"));
-			break;
-		case 1:
-			m_bombs[i]->setTexture(loadTexture("bomb1.png"));
-			break;
-		case 2:
-			m_bombs[i]->setTexture(loadTexture("bomb2.png"));
-			break;
-		case 3:
-			m_bombs[i]->setTexture(loadTexture("bomb3.png"));
-			break;
-		case 4:
-			m_bombs[i]->setTexture(loadTexture("bomb4.png"));
-			break;
-		default:
-			/*delete m_bombs[i];
-			m_bombs[i] = nullptr;*/
-			//std::cerr << "Bomb Error\n";
-			break;
+			int currTime = m_bombs[i]->getCount();
+			switch (currTime)
+			{
+			case 0:
+				m_bombs[i]->setTexture(loadTexture("bomb1.png"));
+				break;
+			case 1:
+				m_bombs[i]->setTexture(loadTexture("bomb1.png"));
+				break;
+			case 2:
+				m_bombs[i]->setTexture(loadTexture("bomb2.png"));
+				break;
+			case 3:
+				m_bombs[i]->setTexture(loadTexture("bomb3.png"));
+				break;
+			case 4:
+				m_bombs[i]->setTexture(loadTexture("bomb4.png"));
+				break;
+			default:
+				std::cout << "Bomb exploded\n";
+				delete m_bombs[i];
+				if(m_bombs[i] == nullptr)
+					m_bombs.erase(m_bombs.begin() + i);
+				--i;
+				break;
+			}
+			m_bombs[i]->draw();
 		}
-		m_bombs[i]->draw();
 	}
 }
 
@@ -314,7 +321,8 @@ void GameManager::runGame()
 		m_window.clear(sf::Color::White);
 		drawBoard();
 		m_player.draw(); 
-		drawBombs(m_bombs);
+		if(!m_bombs.empty())
+			drawBombs(m_bombs);
 		drawToolbar();
 		m_window.display();
 	}

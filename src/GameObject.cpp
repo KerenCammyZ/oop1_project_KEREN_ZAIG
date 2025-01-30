@@ -9,7 +9,10 @@ GameObject::GameObject(sf::RenderWindow& window, sf::Vector2f position) : m_wind
 
 void GameObject::draw() const
 {	
-	m_window->draw(m_sprite);
+	if (this)
+		m_window->draw(m_sprite);
+	else
+		return;
 }
 
 sf::Vector2f GameObject::getPosition() const
