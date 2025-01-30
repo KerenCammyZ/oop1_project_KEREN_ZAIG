@@ -5,6 +5,7 @@
 #include "Rock.h"
 //#include "Player.h"
 #include "Door.h"
+#include "Bomb.h"
 
 GameManager::GameManager() : m_player(m_window, sf::Vector2f(m_tileSize, m_tileSize)) {
 	m_width = 0;
@@ -261,6 +262,12 @@ void GameManager::drawBombs(std::vector<Bomb*>& m_bombs)
 				break;
 			default:
 				std::cout << "Bomb exploded\n";
+				sf::Vector2f bombPos = m_bombs[i]->getPosition();
+				int x = bombPos.x / m_tileSize;
+				int y = bombPos.y / m_tileSize;
+
+				explodeBomb(x, y);
+
 				delete m_bombs[i];
 				m_bombs[i] = nullptr; // Avoid dangling pointer
 				m_bombs.erase(m_bombs.begin() + i);
@@ -270,6 +277,47 @@ void GameManager::drawBombs(std::vector<Bomb*>& m_bombs)
 			if (m_bombs[i] != nullptr) // Check again before drawing
 				m_bombs[i]->draw();
 		
+		}
+	}
+}
+
+void GameManager::explodeBomb(int x, int y)
+{
+	std::vector<std::pair<int, int>> explosionArea = {
+		{x, y}, {x + 1, y}, {x - 1, y}, {x, y + 1}, {x, y - 1} // Explosion in 4 directions
+	};
+
+	for (auto& [ex, ey] : explosionArea)
+	{
+		if (ex < 0 || ey < 0 || ex >= m_width / m_tileSize || ey >= m_height / m_tileSize)
+			continue;
+
+		GameObject* obj = m_board[ey][ex];
+
+		if (!obj) continue;
+
+		switch (obj->getType())
+		{
+		case ROCK:  // Destroy rocks
+			delete obj;
+			m_board[ey][ex] = nullptr;
+			break;
+
+		case GUARD:  // Remove guard from game
+		{
+			auto it = std::find_if(m_guards.begin(), m_guards.end(),
+				[obj](Guard* g) { return g == obj; });
+			if (it != m_guards.end()) m_guards.erase(it);
+			delete obj;
+			m_board[ey][ex] = nullptr;
+			break;
+		}
+		case PLAYER:  // Damage player
+			m_player.lostLife();
+			break;
+
+		default:
+			break;
 		}
 	}
 }
@@ -303,7 +351,7 @@ void GameManager::runGame()
 			case sf::Event::KeyPressed:
 				if (event.key.code == sf::Keyboard::B)
 				{		
-					Bomb *b = new Bomb(m_window, m_player.getSprite().getPosition());
+					Bomb* b = new Bomb(m_window, m_player.getSprite().getPosition().x, m_player.getSprite().getPosition().y);
                     m_bombs.push_back(b);
                    // m_board[m_player.getSprite().getPosition().y / m_tileSize][m_player.getSprite().getPosition().x / m_tileSize] = b;
 				}

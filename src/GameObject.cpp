@@ -4,6 +4,7 @@
 GameObject::GameObject(int x, int y, ObjectType objType, sf::RenderWindow& window) : m_x(x), m_y(y), m_type(objType), m_window(&window)
 {
 	m_position = sf::Vector2f(x, y);
+	m_sprite.setPosition(m_position);
 }
 
 void GameObject::draw() const
@@ -37,6 +38,7 @@ void GameObject::setTexture(sf::Texture texturePath)
 {	
 	m_texture = texturePath;
 	m_sprite.setTexture(m_texture); 
+	m_sprite.setPosition(m_position);
 }
 
 void GameObject::setSprite(const sf::Sprite& sprite)

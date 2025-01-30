@@ -1,17 +1,12 @@
 #pragma once
-#include "MovingObject.h"
+#include "StaticObject.h"
+#include <SFML/Graphics.hpp>
 
-class Bomb : public MovingObject 
+class Bomb : public StaticObject 
 {
 public:
-	Bomb();
-	Bomb(sf::RenderWindow& window, sf::Vector2f position);
-	void move(sf::Time deltaTime, std::vector<std::vector<GameObject*>>& m_board, Player& player) override;
-	void explode(std::vector<std::vector<GameObject*>>& m_board, Player& player);
-	void setAlive(bool flag);
-
+	Bomb(sf::RenderWindow& window, float x, float y);
 	int getCount();
 private:
 	sf::Clock m_timer;
-	bool m_alive = false;
 };
