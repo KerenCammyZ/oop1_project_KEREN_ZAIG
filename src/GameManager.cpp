@@ -130,7 +130,7 @@ void GameManager::mainMenuScreen()
 	m_window.create(sf::VideoMode(menuSize, menuSize), "Bomberman");
 	sf::Font font;
 	if (!font.loadFromFile("Orange Kid.otf"))
-	{
+	{ 
 		std::cerr << "Cannot load font\n";
 	}
 
@@ -251,7 +251,9 @@ void GameManager::drawBombs(std::vector<Bomb*>& m_bombs)
 			m_bombs[i]->setTexture(loadTexture("bomb4.png"));
 			break;
 		default:
-			std::cerr << "Bomb Error\n";
+			/*delete m_bombs[i];
+			m_bombs[i] = nullptr;*/
+			//std::cerr << "Bomb Error\n";
 			break;
 		}
 		m_bombs[i]->draw();
@@ -287,12 +289,13 @@ void GameManager::runGame()
 			case sf::Event::KeyPressed:
 				if (event.key.code == sf::Keyboard::B)
 				{		
-					Bomb *b = new Bomb(m_window, m_player.getPosition());
+					Bomb *b = new Bomb(m_window, m_player.getSprite().getPosition());
                     m_bombs.push_back(b);
-                    m_board[m_player.getPosition().y / m_tileSize][m_player.getPosition().x / m_tileSize] = b;		
+                   // m_board[m_player.getSprite().getPosition().y / m_tileSize][m_player.getSprite().getPosition().x / m_tileSize] = b;
 				}
 				else
 					m_player.setDirection(event.key.code);
+					
 				break;
 
 			default:
@@ -302,6 +305,7 @@ void GameManager::runGame()
 
 		// Update game state
 		m_player.move(deltaTime, m_board, m_player);
+		
 		for (auto& guard : m_guards) {
 			guard->move(deltaTime, m_board, m_player);
 		}

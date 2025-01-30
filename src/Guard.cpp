@@ -39,7 +39,7 @@ void Guard::changeDirection(const Player player)
     }
 }
 
-void Guard::move(sf::Time deltaTime, const std::vector<std::vector<GameObject*>>& m_board, Player &player)
+void Guard::move(sf::Time deltaTime, std::vector<std::vector<GameObject*>>& m_board, Player &player)
 {
     const auto speedPerSecond = static_cast<float>(m_tileSize);
 
