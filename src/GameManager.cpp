@@ -1,5 +1,10 @@
 #include "GameManager.h"
+#include "GameObject.h"
 #include "Guard.h"
+#include "Wall.h"
+#include "Rock.h"
+//#include "Player.h"
+#include "Door.h"
 
 GameManager::GameManager() : m_player(m_window, sf::Vector2f(m_tileSize, m_tileSize)) {
 	m_width = 0;
@@ -41,7 +46,7 @@ void GameManager::drawBoard()
 	if (m_window.isOpen() && !m_board.empty()) {
 		for (const auto& row : m_board) {
 			for (const auto& obj : row) {
-				if (obj) { 
+				if (obj != nullptr) { 
 					obj->draw();
 				}
 			}
@@ -90,24 +95,21 @@ void GameManager::drawLevel(int level)
 			switch (tile) {
 			
 			case '#':
-				gameObject = new GameObject(m_window, sf::Vector2f(col * m_tileSize, m_tileSize + row * m_tileSize));
+				gameObject = new Wall(col * m_tileSize, m_tileSize + row * m_tileSize);
 				gameObject->setTexture(loadTexture("wall.png"));
-				gameObject->setType(WALL);
 				break;
 			case '@':
-				gameObject = new GameObject(m_window, sf::Vector2f(col * m_tileSize, m_tileSize + row * m_tileSize));
+				gameObject = new Rock(col * m_tileSize, m_tileSize + row * m_tileSize);
 				gameObject->setTexture(loadTexture("rock.png"));
-				gameObject->setType("rock");
 				break;
 			case 'D':
-				gameObject = new GameObject(m_window, sf::Vector2f(col * m_tileSize, m_tileSize + row * m_tileSize));
+				gameObject = new Door(col * m_tileSize, m_tileSize + row * m_tileSize);
 				gameObject->setTexture(loadTexture("door.png"));
-				gameObject->setType("door");
 				break;
 			case '!':
 				gameObject = new Guard(m_window, sf::Vector2f(col * m_tileSize, m_tileSize + row * m_tileSize));
 				gameObject->setTexture(loadTexture("guard.png"));
-				gameObject->setType("guard");
+				gameObject->setType(GUARD);
 				m_guards.push_back(dynamic_cast<Guard*>(gameObject));
 				break;
 			default:

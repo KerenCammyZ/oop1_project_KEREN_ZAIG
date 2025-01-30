@@ -69,7 +69,7 @@ void Guard::move(sf::Time deltaTime, std::vector<std::vector<GameObject*>>& m_bo
 
                 // Check for collision with the object
                 if (objectBounds.intersects(predictedBounds)) {
-                    if (obj->getType() == "wall" || obj->getType() == "rock") 
+                    if (obj->getType() == WALL || obj->getType() == ROCK) 
                     {
                         // Resolve the collision by adjusting the movement
                         sf::FloatRect intersection;

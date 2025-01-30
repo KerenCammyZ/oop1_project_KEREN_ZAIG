@@ -6,8 +6,8 @@ class Player;
 class MovingObject : public GameObject 
 {
 public:
-	MovingObject();
 	MovingObject(sf::RenderWindow& window, sf::Vector2f position);
+	MovingObject();
 	virtual void move(sf::Time deltaTime, std::vector<std::vector<GameObject*>>& m_board, Player &player);
 	void setDirection(sf::Keyboard::Key key);
 	void moveSprite(const sf::Vector2f& offset);

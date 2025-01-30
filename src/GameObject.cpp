@@ -1,7 +1,7 @@
 #include "GameObject.h"
 #include <iostream>
 
-GameObject::GameObject(int x, int y, ObjectType objType) : m_x(x), m_y(y), m_type(objType) 
+GameObject::GameObject(int x, int y, ObjectType objType, sf::RenderWindow& window) : m_x(x), m_y(y), m_type(objType), m_window(&window)
 {
 	m_position = sf::Vector2f(x, y);
 }

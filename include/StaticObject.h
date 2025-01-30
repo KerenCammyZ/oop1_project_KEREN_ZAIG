@@ -4,6 +4,6 @@
 class StaticObject : public GameObject 
 {
 public:
-	StaticObject(int x, int y, ObjectType obj);
+	StaticObject(int x, int y, ObjectType obj, sf::RenderWindow &window);
 private:
 };

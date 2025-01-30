@@ -1,7 +1,7 @@
 #include "MovingObject.h"
 #include "Player.h"
 
-MovingObject::MovingObject(sf::RenderWindow& window, sf::Vector2f position) : GameObject(window, position){}
+MovingObject::MovingObject(sf::RenderWindow& window, sf::Vector2f position) : GameObject(position.x, position.y, UNKNOWN, window){}
 
 MovingObject::MovingObject()
 {
@@ -37,7 +37,7 @@ void MovingObject::move(sf::Time deltaTime, std::vector<std::vector<GameObject*>
 
                 // Check for collision with the object
                 if (objectBounds.intersects(predictedBounds)) {
-                    if (obj->getType() == "wall" || obj->getType() == "rock") {
+                    if (obj->getType() == WALL || obj->getType() == ROCK) {
                         // Resolve the collision by adjusting the movement
                         sf::FloatRect intersection;
                         if (predictedBounds.intersects(objectBounds, intersection)) {
