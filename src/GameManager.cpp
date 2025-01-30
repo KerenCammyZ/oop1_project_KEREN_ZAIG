@@ -286,11 +286,13 @@ void GameManager::runGame()
 
 			case sf::Event::KeyPressed:
 				if (event.key.code == sf::Keyboard::B)
-				{
-					m_bombs.push_back(new Bomb(m_window, m_player.getPosition()));
+				{		
+					Bomb *b = new Bomb(m_window, m_player.getPosition());
+                    m_bombs.push_back(b);
+                    m_board[m_player.getPosition().y / m_tileSize][m_player.getPosition().x / m_tileSize] = b;		
 				}
 				else
-				m_player.setDirection(event.key.code);
+					m_player.setDirection(event.key.code);
 				break;
 
 			default:

@@ -64,7 +64,9 @@ void MovingObject::move(sf::Time deltaTime, const std::vector<std::vector<GameOb
     // Apply the resolved movement if no collision blocks it
     if (canMove || movement != sf::Vector2f(0, 0)) {
         moveSprite(movement);
+        m_position = movement;
     }
+
 
     // Reset direction if movement is blocked for too long
     if (m_direction != sf::Vector2f(0, 0) && m_movementTimer.getElapsedTime().asSeconds() > m_maxMovementTime) {
