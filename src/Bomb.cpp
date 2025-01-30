@@ -1,4 +1,4 @@
-#include "Bomb.h"
+﻿#include "Bomb.h"
 #include "Player.h"
 
 Bomb::Bomb() : MovingObject()
@@ -26,55 +26,43 @@ void Bomb::move(sf::Time deltaTime, std::vector<std::vector<GameObject*>>& m_boa
 		return;
 }
 
-void Bomb::explode(std::vector<std::vector<GameObject*>>& m_board, Player& player)
+void Bomb::explode(std::vector<std::vector<GameObject*>>& board, Player& player)
 {
-	int centerX = getSprite().getPosition().x;
-	int centerY = getSprite().getPosition().y;
+	//std::cout << " Bomb exploded! \n";
 
-	std::string center = m_board[centerX][centerY]->getType();
-	std::string left = m_board[centerX - 1][centerY]->getType();
-	std::string right = m_board[centerX + 1][centerY]->getType();
-	std::string up = m_board[centerX][centerY + 1]->getType();
-	std::string down = m_board[centerX][centerY - 1]->getType();
-
-	if (center == "player" || left == "player" || right == "player" || up == "player" || down == "player")
+	for (int i = 0; i < board.size(); i++)
 	{
+		GameObject* obj = board[i][j];
+
+		if (obj == nullptr) continue; // Safety check
+
+		//  Check if the object is a Rock
+		Rock* rock = dynamic_cast<Rock*>(obj);
+		if (rock && checkCollision(this, rock))
+		{
+			std::cout << "🪨 Rock destroyed!\n";
+			delete board[i];
+			board.erase(board.begin() + i);
+			i--; // Adjust index after erasing
+			continue;
+		}
+
+		//  Check if the object is a Wall (Walls should NOT be destroyed)
+		Wall* wall = dynamic_cast<Wall*>(obj);
+		if (wall && checkCollision(this, wall))
+		{
+			std::cout << "🧱 Bomb hit a wall! Nothing happens.\n";
+			continue;
+		}
+	}
+
+	//  Check if Player is hit
+	if (checkCollision(this, player))
+	{
+		//std::cout << " Player hit! Losing life.\n";
 		player.lostLife();
 	}
-	if (center == "guard" || left == "guard" || right == "guard" || up == "guard" || down == "guard")
-	{
-		//make guard dissapear here
 	}
-	if (center == "rock" || left == "rock" || right == "rock" || up == "rock" || down == "rock")
-	{
-		//make rock dissapear here
-		if (center == "rock")
-		{
-			delete m_board[centerX][centerY];
-			m_board[centerX][centerY] = nullptr;
-		}
-		if (left == "rock")
-		{
-			delete m_board[centerX - 1][centerY];
-			m_board[centerX - 1][centerY] = nullptr;
-		}
-		if (right == "rock")
-		{
-			delete m_board[centerX + 1][centerY];
-			m_board[centerX + 1][centerY] = nullptr;
-		}
-		if (up == "rock")
-		{
-			delete m_board[centerX][centerY + 1];
-			m_board[centerX][centerY + 1] = nullptr;
-		}
-		if (down == "rock")
-		{
-			delete m_board[centerX][centerY - 1];
-			m_board[centerX][centerY - 1] = nullptr;
-		}
-	}
-	
 }
 
 

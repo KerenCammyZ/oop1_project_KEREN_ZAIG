@@ -9,10 +9,8 @@ GameObject::GameObject(sf::RenderWindow& window, sf::Vector2f position) : m_wind
 
 void GameObject::draw() const
 {	
-	if (this)
+	if (m_window)
 		m_window->draw(m_sprite);
-	else
-		return;
 }
 
 sf::Vector2f GameObject::getPosition() const
@@ -65,4 +63,12 @@ std::string GameObject::getType() const
 void GameObject::setType(const std::string& type)
 {
 	m_type = type;
+}
+
+bool GameObject::checkCollision(GameObject* a, GameObject* b)
+{
+	return (a->getX() < b->getX() + b->getWidth() &&
+		a->getX() + a->getWidth() > b->getX() &&
+		a->getY() < b->getY() + b->getHeight() &&
+		a->getY() + a->getHeight() > b->getY());
 }

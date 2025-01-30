@@ -21,6 +21,8 @@ public:
 	std::string getType() const;
 	void setType(const std::string& type);
 
+	bool checkCollision(GameObject* a, GameObject* b);
+
 private:
 	sf::RenderWindow* m_window; // Change to pointer
 	sf::Vector2f m_position = sf::Vector2f(0,0);

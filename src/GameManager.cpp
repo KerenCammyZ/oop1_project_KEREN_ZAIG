@@ -254,15 +254,20 @@ void GameManager::drawBombs(std::vector<Bomb*>& m_bombs)
 			case 4:
 				m_bombs[i]->setTexture(loadTexture("bomb4.png"));
 				break;
+			case 5:
+				m_bombs[i]->setTexture(loadTexture("explosion.png"));
+				break;
 			default:
 				std::cout << "Bomb exploded\n";
 				delete m_bombs[i];
-				if(m_bombs[i] == nullptr)
-					m_bombs.erase(m_bombs.begin() + i);
-				--i;
-				break;
+				m_bombs[i] = nullptr; // Avoid dangling pointer
+				m_bombs.erase(m_bombs.begin() + i);
+				--i; // Adjust index after erasing
+				continue;
 			}
-			m_bombs[i]->draw();
+			if (m_bombs[i] != nullptr) // Check again before drawing
+				m_bombs[i]->draw();
+		
 		}
 	}
 }
