@@ -3,8 +3,7 @@
 #include "GlobalSizes.h"
 
 class GameObject {
-protected:
-	std::string m_type; //type of object
+
 public:
 	virtual ~GameObject() = default; // Add virtual destructor
 	GameObject() = default;
@@ -20,8 +19,9 @@ public:
 	sf::FloatRect getBounds() const;
 	std::string getType() const;
 	void setType(const std::string& type);
-
 	bool checkCollision(GameObject* a, GameObject* b);
+
+	enum ObjectType { UNKNOWN, WALL, ROCK, PLAYER, BOMB };
 
 private:
 	sf::RenderWindow* m_window; // Change to pointer

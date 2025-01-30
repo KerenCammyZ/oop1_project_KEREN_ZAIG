@@ -28,6 +28,7 @@ void Bomb::move(sf::Time deltaTime, std::vector<std::vector<GameObject*>>& m_boa
 
 void Bomb::explode(std::vector<std::vector<GameObject*>>& board, Player& player)
 {
+	/*
 	//std::cout << " Bomb exploded! \n";
 
 	for (int i = 0; i < board.size(); i++)
@@ -54,6 +55,7 @@ void Bomb::explode(std::vector<std::vector<GameObject*>>& board, Player& player)
 			std::cout << "🧱 Bomb hit a wall! Nothing happens.\n";
 			continue;
 		}
+		
 	}
 
 	//  Check if Player is hit
@@ -63,6 +65,7 @@ void Bomb::explode(std::vector<std::vector<GameObject*>>& board, Player& player)
 		player.lostLife();
 	}
 	}
+	*/
 }
 
 
