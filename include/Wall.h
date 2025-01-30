@@ -4,5 +4,5 @@
 class Wall : public StaticObject
 {
 public:
-	Wall(int x, int y);
+	Wall(int x, int y, sf::RenderWindow& window);
 };

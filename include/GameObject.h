@@ -26,7 +26,7 @@ public:
 
 protected:
 	sf::RenderWindow* m_window; // Change to pointer
-	sf::Vector2f m_position;
+	sf::Vector2f m_position = sf::Vector2f(0,0);
 	int m_x, m_y;
 	sf::Texture m_texture;
 	sf::Sprite m_sprite;

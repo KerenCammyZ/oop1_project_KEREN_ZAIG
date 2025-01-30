@@ -1,3 +1,3 @@
 #include "Wall.h"
 
-Wall::Wall(int x, int y): StaticObject(x, y, WALL, *m_window) {}
+Wall::Wall(int x, int y, sf::RenderWindow& window) : StaticObject(x, y, WALL, window) {}

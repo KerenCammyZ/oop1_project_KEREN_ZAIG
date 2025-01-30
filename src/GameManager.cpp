@@ -95,15 +95,15 @@ void GameManager::drawLevel(int level)
 			switch (tile) {
 			
 			case '#':
-				gameObject = new Wall(col * m_tileSize, m_tileSize + row * m_tileSize);
+				gameObject = new Wall(col * m_tileSize, m_tileSize + row * m_tileSize, m_window);
 				gameObject->setTexture(loadTexture("wall.png"));
 				break;
 			case '@':
-				gameObject = new Rock(col * m_tileSize, m_tileSize + row * m_tileSize);
+				gameObject = new Rock(col * m_tileSize, m_tileSize + row * m_tileSize, m_window);
 				gameObject->setTexture(loadTexture("rock.png"));
 				break;
 			case 'D':
-				gameObject = new Door(col * m_tileSize, m_tileSize + row * m_tileSize);
+				gameObject = new Door(col * m_tileSize, m_tileSize + row * m_tileSize, m_window);
 				gameObject->setTexture(loadTexture("door.png"));
 				break;
 			case '!':

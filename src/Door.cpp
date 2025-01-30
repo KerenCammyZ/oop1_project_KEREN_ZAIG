@@ -1,3 +1,3 @@
 #include "Door.h"
 
-Door::Door(int x, int y) : StaticObject(x, y, DOOR, *m_window) {}
+Door::Door(int x, int y, sf::RenderWindow& window) : StaticObject(x, y, DOOR, window) {}

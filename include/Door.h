@@ -4,5 +4,5 @@
 class Door : public StaticObject
 {
 public:
-	Door(int x, int y);
+	Door(int x, int y, sf::RenderWindow& window);
 };
