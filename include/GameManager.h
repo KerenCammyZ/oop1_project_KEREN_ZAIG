@@ -23,7 +23,7 @@ public:
 	void toolbar();
 	void drawToolbar();
 	void drawBombs(std::vector<Bomb*> &m_bombs);
-	void explodeBomb(int x, int y);
+	void explodeBomb(float x, float y);
 private:
 	std::vector<std::vector<GameObject*>> m_board;
 	sf::RenderWindow m_window;

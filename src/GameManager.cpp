@@ -261,10 +261,9 @@ void GameManager::drawBombs(std::vector<Bomb*>& m_bombs)
 				m_bombs[i]->setTexture(loadTexture("explosion.png"));
 				break;
 			default:
-				std::cout << "Bomb exploded\n";
 				sf::Vector2f bombPos = m_bombs[i]->getPosition();
-				int x = bombPos.x / m_tileSize;
-				int y = bombPos.y / m_tileSize;
+				float x = bombPos.x / m_tileSize;
+				float y = bombPos.y / m_tileSize;
 
 				explodeBomb(x, y);
 
@@ -281,10 +280,12 @@ void GameManager::drawBombs(std::vector<Bomb*>& m_bombs)
 	}
 }
 
-void GameManager::explodeBomb(int x, int y)
+void GameManager::explodeBomb(float x, float y)
 {
-	std::vector<std::pair<int, int>> explosionArea = {
-		{x, y}, {x + 1, y}, {x - 1, y}, {x, y + 1}, {x, y - 1} // Explosion in 4 directions
+	bool flag = true;
+	std::vector<std::pair<float, float>> explosionArea = {
+		{x, y}, {x + 1, y}, {x - 1, y}, {x, y + 1}, {x, y - 1},  // Explosion in 4 directions
+		{x + 1, y + 1} , {x - 1, y + 1}, {x - 1, y - 1}, {x + 1, y - 1}
 	};
 
 	for (auto& [ex, ey] : explosionArea)
@@ -304,31 +305,35 @@ void GameManager::explodeBomb(int x, int y)
 			break;
 
 		case GUARD:  // Remove guard from game
-
-			for (int i = 0; i < m_guards.size(); i++) 
+			for (int i = 0; !flag || i < m_guards.size(); i++) 
 			{
-				sf::Vector2f guardPos = m_guards[i]->getPosition();
-				int guardX = guardPos.x / m_tileSize;
-				int guardY = guardPos.y / m_tileSize;
-				if (guardX == ex && guardY == ey)
+
+				sf::Vector2f currGuardPos(m_guards[i]->getSprite().getPosition());
+
+				float guardX = currGuardPos.x / m_tileSize;
+				float guardY = currGuardPos.y / m_tileSize;
+				std::cout << "Checking guard at (" << guardX << ", " << guardY << ") against explosion at (" << ex << ", " << ey << ")\n";
+
+
+				if (m_guards[i]->getBounds().contains(ex * m_tileSize, ey * m_tileSize))
 				{
 					m_guards[i]->setDead();
+
+					std::cout << "Guard is dead\n";
+
+					m_guards[i]->draw();
+					std::cout << "Guard dissapeared\n";
+
+
 					//delete m_guards[i];
 					//m_guards[i] = nullptr; // Avoid dangling pointer
 					//m_guards.erase(m_guards.begin() + i);
 					//--i; // Adjust index after erasing
-					continue;
+					//flag = false;
 				}
+					
 			}
 			break;
-		/*{
-			auto it = std::find_if(m_guards.begin(), m_guards.end(),
-				[obj](Guard* g) { return g == obj; });
-			if (it != m_guards.end()) m_guards.erase(it);
-			delete obj;
-			m_board[ey][ex] = nullptr;
-			break;
-		}*/
 		case PLAYER:  // Damage player
 			m_player.lostLife();
 			break;
@@ -370,6 +375,7 @@ void GameManager::runGame()
 				{		
 					Bomb* b = new Bomb(m_window, m_player.getSprite().getPosition().x, m_player.getSprite().getPosition().y);
                     m_bombs.push_back(b);
+					std::cout << "Bomb placed at (" << m_player.getSprite().getPosition().x / m_tileSize << ", " << m_player.getSprite().getPosition().y / m_tileSize << ")" << std::endl;
                    // m_board[m_player.getSprite().getPosition().y / m_tileSize][m_player.getSprite().getPosition().x / m_tileSize] = b;
 				}
 				else
@@ -387,6 +393,9 @@ void GameManager::runGame()
 		
 		for (auto& guard : m_guards) {
 			guard->move(deltaTime, m_board, m_player);
+			/*std::cout << "Guard position: "
+				<< guard->getSprite().getPosition().x << ", "
+				<< guard->getSprite().getPosition().y << std::endl;*/
 		}
 
 		// Render the scene

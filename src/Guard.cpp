@@ -7,6 +7,7 @@ Guard::Guard(sf::RenderWindow& window, sf::Vector2f position)
 	: MovingObject(window, position)
 {
 	m_alive = true;
+    m_type = GUARD;
 }
 
 sf::Vector2f Guard::findPlayerDirection(const sf::Vector2f& playerPosition)

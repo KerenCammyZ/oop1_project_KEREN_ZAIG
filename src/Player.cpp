@@ -28,4 +28,5 @@ void Player::lostLife()
 void Player::respawn()
 {
     setPosition(sf::Vector2f(m_tileSize, m_tileSize));
+    setDirection(sf::Keyboard::Space);
 }
