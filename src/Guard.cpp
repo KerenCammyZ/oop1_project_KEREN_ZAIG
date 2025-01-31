@@ -39,6 +39,22 @@ void Guard::changeDirection(const Player player)
     }
 }
 
+void Guard::draw() const
+{
+    if (m_alive)
+        m_window->draw(m_sprite);
+}
+
+bool Guard::isAlive()
+{
+    return m_alive;
+}
+
+void Guard::setDead()
+{
+    m_alive = false;
+}
+
 void Guard::move(sf::Time deltaTime, std::vector<std::vector<GameObject*>>& m_board, Player &player)
 {
     const auto speedPerSecond = static_cast<float>(m_tileSize);

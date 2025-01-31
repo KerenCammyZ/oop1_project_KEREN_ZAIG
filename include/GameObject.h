@@ -4,11 +4,10 @@
 
 class GameObject {
 public:
-	//enum ObjectType { UNKNOWN, WALL, ROCK, PLAYER, BOMB };
 	virtual ~GameObject() = default; // Add virtual destructor
 	GameObject() = default;
 	GameObject(int x, int y, ObjectType type, sf::RenderWindow& window);
-	void draw() const;
+	virtual void draw() const;
 	sf::Vector2f getPosition() const;
 	sf::Sprite getSprite() const;
 	sf::Texture getTexture() const;

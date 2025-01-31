@@ -8,6 +8,9 @@ public:
 	void move(sf::Time deltaTime, std::vector<std::vector<GameObject*>>& m_board, Player &player) override;
 	sf::Vector2f findPlayerDirection(const sf::Vector2f& playerPosition);
 	void changeDirection(const Player player);
+	void draw() const override;
+	bool isAlive();
+	void setDead();
 private:
 	bool m_alive;
 	sf::Clock m_directionChangeClock;  // Timer to track the direction change

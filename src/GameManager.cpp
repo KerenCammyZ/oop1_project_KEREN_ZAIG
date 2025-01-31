@@ -304,14 +304,31 @@ void GameManager::explodeBomb(int x, int y)
 			break;
 
 		case GUARD:  // Remove guard from game
-		{
+
+			for (int i = 0; i < m_guards.size(); i++) 
+			{
+				sf::Vector2f guardPos = m_guards[i]->getPosition();
+				int guardX = guardPos.x / m_tileSize;
+				int guardY = guardPos.y / m_tileSize;
+				if (guardX == ex && guardY == ey)
+				{
+					m_guards[i]->setDead();
+					//delete m_guards[i];
+					//m_guards[i] = nullptr; // Avoid dangling pointer
+					//m_guards.erase(m_guards.begin() + i);
+					//--i; // Adjust index after erasing
+					continue;
+				}
+			}
+			break;
+		/*{
 			auto it = std::find_if(m_guards.begin(), m_guards.end(),
 				[obj](Guard* g) { return g == obj; });
 			if (it != m_guards.end()) m_guards.erase(it);
 			delete obj;
 			m_board[ey][ex] = nullptr;
 			break;
-		}
+		}*/
 		case PLAYER:  // Damage player
 			m_player.lostLife();
 			break;
