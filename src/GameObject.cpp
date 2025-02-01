@@ -70,6 +70,14 @@ bool GameObject::checkCollision(GameObject* a, GameObject* b)
 		a->getY() + a->getHeight() > b->getY());
 }
 
+bool GameObject::checkCollision(GameObject* b)
+{
+	return (this->getX() < b->getX() + b->getWidth() &&
+		this->getX() + this->getWidth() > b->getX() &&
+		this->getY() < b->getY() + b->getHeight() &&
+		this->getY() + this->getHeight() > b->getY());
+}
+
 int GameObject::getX()
 {
 	return m_position.x / m_tileSize;

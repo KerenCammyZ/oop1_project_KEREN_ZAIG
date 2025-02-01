@@ -91,6 +91,7 @@ void GameManager::drawLevel(int level)
 		for (int col = 0; col < numCols; ++col) {
 			char tile = lines[row][col];
 			GameObject* gameObject = nullptr;
+			Guard* g = nullptr;
 
 			switch (tile) {
 			
@@ -108,10 +109,10 @@ void GameManager::drawLevel(int level)
                 m_currLeveldoor = dynamic_cast<Door*>(gameObject);
 				break;
 			case '!':
-				gameObject = new Guard(m_window, sf::Vector2f(col * m_tileSize, m_tileSize + row * m_tileSize));
-				gameObject->setTexture(loadTexture("guard.png"));
-				gameObject->setType(GUARD);
-				m_guards.push_back(dynamic_cast<Guard*>(gameObject));
+				g = new Guard(m_window, sf::Vector2f(col * m_tileSize, m_tileSize + row * m_tileSize));
+				g->setTexture(loadTexture("guard.png"));
+				g->setType(GUARD);
+				m_guards.push_back(g);
 				break;
 			default:
 				break;
@@ -295,75 +296,6 @@ void GameManager::drawBombs(std::vector<Bomb*>& m_bombs)
 	}
 }
 
-//void GameManager::explodeBomb(float x, float y)
-//{
-//	bool flag = true;
-//	std::vector<std::pair<float, float>> explosionArea = {
-//		{x, y}, {x + 1, y}, {x - 1, y}, {x, y + 1}, {x, y - 1},  // Explosion in 4 directions
-//		{x + 1, y + 1} , {x - 1, y + 1}, {x - 1, y - 1}, {x + 1, y - 1}
-//	};
-//
-//	int maxX = m_width / m_tileSize;
-//    int maxY = m_height / m_tileSize;
-//    int boardWidth = m_board[0].size();
-//
-//	for (auto& [ex, ey] : explosionArea)
-//	{int maxX = m_width / m_tileSize;
-//    int maxY = m_height / m_tileSize;
-//    int boardWidth = m_board[0].size();
-//		if (ex < 0 || ey < 0 || ex >= m_width / m_tileSize || ey >= m_height / m_tileSize)
-//			continue;
-//
-//		GameObject* obj = m_board[ey][ex];
-//
-//		if (!obj) continue;
-//
-//		switch (obj->getType())
-//		{
-//		case ROCK:  // Destroy rocks
-//			delete obj;
-//			m_board[ey][ex] = nullptr;
-//			break;
-//
-//		case GUARD:  // Remove guard from game
-//			for (int i = 0; !flag || i < m_guards.size(); i++) 
-//			{
-//
-//				sf::Vector2f currGuardPos(m_guards[i]->getSprite().getPosition());
-//
-//				float guardX = currGuardPos.x / m_tileSize;
-//				float guardY = currGuardPos.y / m_tileSize;
-//				std::cout << "Checking guard at (" << guardX << ", " << guardY << ") against explosion at (" << ex << ", " << ey << ")\n";
-//
-//
-//				if (m_guards[i]->getBounds().contains(ex * m_tileSize, ey * m_tileSize))
-//				{
-//					m_guards[i]->setDead();
-//
-//					std::cout << "Guard is dead\n";
-//
-//					m_guards[i]->draw();
-//					std::cout << "Guard dissapeared\n";
-//
-//					delete m_guards[i];
-//					m_guards[i] = nullptr; // Avoid dangling pointer
-//					m_guards.erase(m_guards.begin() + i);
-//					--i; // Adjust index after erasing
-//					flag = false;
-//				}
-//					
-//			}
-//			break;
-//		case PLAYER:  // Damage player
-//			m_player.lostLife();
-//			break;
-//
-//		default:
-//			break;
-//		}
-//	}
-//}
-
 void GameManager::explodeBomb(float x, float y)
 {
 	std::vector<std::pair<int, int>> explosionArea = {
@@ -392,21 +324,41 @@ void GameManager::explodeBomb(float x, float y)
 			m_board[ey][ex] = nullptr;
 			break;
 
-		case GUARD:
-			// Iterate through the guard list and remove the correct one
-			for (size_t i = 0; i < m_guards.size(); i++)
-			{
-				if (m_guards[i] && m_guards[i]->getBounds().intersects(obj->getBounds()))
-				{
-					delete m_guards[i];
-					m_guards.erase(m_guards.begin() + i);
-					m_board[ey][ex] = nullptr; // Ensure it is also removed from the board
-					break;
-				}
-			}
-			break;
 		default:
 			break;
+		}
+	}
+	for (size_t i = 0; i < m_guards.size(); i++)
+	{
+		if (!m_guards[i]) continue;
+
+		sf::FloatRect guardBounds = m_guards[i]->getBounds();
+
+		// Check if guard is within explosion radius
+		for (auto& [ex, ey] : explosionArea)
+		{
+			sf::Vector2f explosionPos(ex * m_tileSize, ey * m_tileSize);
+			if (guardBounds.contains(explosionPos))
+			{
+				std::cout << "Guard at (" << ex << ", " << ey << ") hit by explosion!\n";
+
+				delete m_guards[i];
+				m_guards[i] = nullptr;
+				m_guards.erase(m_guards.begin() + i);
+				--i; // Adjust index after erasing
+				break; // Exit inner loop once guard is removed
+			}
+		}
+	}
+}
+
+void GameManager::drawGuards()
+{
+	if (!m_guards.empty())
+	{
+		for (int i = 0; i < m_guards.size(); i++)
+		{
+			m_guards[i]->draw();
 		}
 	}
 }
@@ -488,6 +440,7 @@ void GameManager::runGame()
 				// Render the scene
 				m_window.clear(sf::Color::White);
 				drawBoard();
+				drawGuards();
 				m_player.draw();
 				if (!m_bombs.empty())
 					drawBombs(m_bombs);

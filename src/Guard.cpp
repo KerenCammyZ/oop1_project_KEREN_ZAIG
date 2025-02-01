@@ -121,4 +121,3 @@ void Guard::move(sf::Time deltaTime, std::vector<std::vector<GameObject*>>& m_bo
     if (m_sprite.getGlobalBounds().intersects(player.getBounds()))
         player.lostLife();
 }
-

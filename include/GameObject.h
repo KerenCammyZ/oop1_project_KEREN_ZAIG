@@ -18,6 +18,7 @@ public:
 	ObjectType getType() const;
 	void setType(ObjectType obj);
 	bool checkCollision(GameObject* a, GameObject* b);
+	bool checkCollision(GameObject* b);
 	int getX();
 	int getY();
 	int getWidth();

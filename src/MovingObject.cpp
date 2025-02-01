@@ -1,6 +1,7 @@
 #include "MovingObject.h"
 #include "Player.h"
 #include "Door.h"
+using std::round;
 
 MovingObject::MovingObject(sf::RenderWindow& window, sf::Vector2f position) : GameObject(position.x, position.y, UNKNOWN, window){}
 

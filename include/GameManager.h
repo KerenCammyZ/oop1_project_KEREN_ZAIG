@@ -25,6 +25,7 @@ public:
 	void drawToolbar();
 	void drawBombs(std::vector<Bomb*> &m_bombs);
 	void explodeBomb(float x, float y);
+	void drawGuards();
 private:
 	std::vector<std::vector<GameObject*>> m_board;
 	sf::RenderWindow m_window;
