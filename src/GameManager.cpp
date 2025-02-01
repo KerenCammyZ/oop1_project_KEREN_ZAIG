@@ -277,6 +277,10 @@ void GameManager::drawBombs(std::vector<Bomb*>& m_bombs)
 				float y = bombPos.y / m_tileSize;
 
 				explodeBomb(x, y);
+				if (m_bombs[i]->getBounds().intersects(m_player.getBounds()))
+				{
+					m_player.lostLife();
+				}
 
 				delete m_bombs[i];
 				m_bombs[i] = nullptr; // Avoid dangling pointer
@@ -370,6 +374,7 @@ void GameManager::explodeBomb(float x, float y)
 	int maxRows = m_board.size();
 	int maxCols = (maxRows > 0) ? m_board[0].size() : 0;
 
+
 	for (auto& [ex, ey] : explosionArea)
 	{
 		// Ensure indices are within bounds
@@ -388,21 +393,18 @@ void GameManager::explodeBomb(float x, float y)
 			break;
 
 		case GUARD:
+			// Iterate through the guard list and remove the correct one
 			for (size_t i = 0; i < m_guards.size(); i++)
 			{
-				if (m_guards[i]->getBounds().contains(ex * m_tileSize, ey * m_tileSize))
+				if (m_guards[i] && m_guards[i]->getBounds().intersects(obj->getBounds()))
 				{
 					delete m_guards[i];
 					m_guards.erase(m_guards.begin() + i);
-					--i; // Adjust index after erasing
+					m_board[ey][ex] = nullptr; // Ensure it is also removed from the board
+					break;
 				}
 			}
 			break;
-
-		case PLAYER:
-			m_player.lostLife();
-			break;
-
 		default:
 			break;
 		}
@@ -422,7 +424,7 @@ void GameManager::runGame()
 		while (m_currLevel != 4)
 		{
 			// Load level
-			drawLevel(m_currLevel);
+			drawLevel(m_currLevel); //TODO: delete m_guards at the start of each new level
 			m_window.setFramerateLimit(60);
 			m_player.respawn();
 

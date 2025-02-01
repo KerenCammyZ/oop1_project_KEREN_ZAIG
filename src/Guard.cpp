@@ -58,6 +58,7 @@ void Guard::setDead()
 
 void Guard::move(sf::Time deltaTime, std::vector<std::vector<GameObject*>>& m_board, Player &player)
 {
+    //old working version:
     const auto speedPerSecond = static_cast<float>(m_tileSize);
 
     // Check if it's time to change direction
