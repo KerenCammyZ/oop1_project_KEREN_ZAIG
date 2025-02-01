@@ -7,11 +7,8 @@ public:
 	Player();	
 	void lostLife();
 	int getLives() const { return m_lives; }
-	int getScore() const { return m_score; }
 	void respawn();
 private:
 	int m_lives = 3;
-	int m_score = 0;
-	bool m_alive = true;
 };
 

@@ -126,6 +126,8 @@ void GameManager::drawLevel(int level)
 			}
 		}
 	}
+	if (!m_guards.empty())
+		m_levelNumGuards = m_guards.size();
 }
 
 void GameManager::mainMenuScreen()
@@ -223,7 +225,7 @@ void GameManager::drawToolbar()
 		return;
 	}
 	m_livesText.setString("Lives: " + std::to_string(m_player.getLives()));
-	m_scoreText.setString("Score: " + std::to_string(m_player.getScore()));
+	m_scoreText.setString("Score: " + std::to_string(m_score));
 	m_levelText.setString("Level: " + std::to_string(m_currLevel));
 	m_helpText.setString("Help");
 	m_exitText.setString("Exit");
@@ -340,11 +342,7 @@ void GameManager::explodeBomb(float x, float y)
 			sf::Vector2f explosionPos(ex * m_tileSize, ey * m_tileSize);
 			if (guardBounds.contains(explosionPos))
 			{
-				std::cout << "Guard at (" << ex << ", " << ey << ") hit by explosion!\n";
-
-				delete m_guards[i];
-				m_guards[i] = nullptr;
-				m_guards.erase(m_guards.begin() + i);
+				killGuard(i);
 				--i; // Adjust index after erasing
 				break; // Exit inner loop once guard is removed
 			}
@@ -361,6 +359,17 @@ void GameManager::drawGuards()
 			m_guards[i]->draw();
 		}
 	}
+}
+
+void GameManager::killGuard(int i)
+{
+	if (!m_guards.empty())
+	{
+		delete m_guards[i];
+		m_guards[i] = nullptr;
+		m_guards.erase(m_guards.begin() + i);
+	}
+	m_score += 5;
 }
 
 void GameManager::runGame() 
@@ -406,8 +415,6 @@ void GameManager::runGame()
 						{
 							Bomb* b = new Bomb(m_window, m_player.getSprite().getPosition().x, m_player.getSprite().getPosition().y);
 							m_bombs.push_back(b);
-							std::cout << "Bomb placed at (" << m_player.getSprite().getPosition().x / m_tileSize << ", " << m_player.getSprite().getPosition().y / m_tileSize << ")" << std::endl;
-							// m_board[m_player.getSprite().getPosition().y / m_tileSize][m_player.getSprite().getPosition().x / m_tileSize] = b;
 						}
 						else
 							m_player.setDirection(event.key.code);
@@ -433,6 +440,7 @@ void GameManager::runGame()
 
 				if (m_currLeveldoor->getPassed())
 				{
+					m_score = 25 + (3 * m_levelNumGuards);
 					m_currLevel++;
 					m_window.close();
 				}
