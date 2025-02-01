@@ -3,7 +3,6 @@
 #include "Guard.h"
 #include "Wall.h"
 #include "Rock.h"
-//#include "Player.h"
 #include "Door.h"
 #include "Bomb.h"
 
@@ -131,7 +130,7 @@ void GameManager::drawLevel(int level)
 void GameManager::mainMenuScreen()
 {
 	int menuSize = 500;
-	m_window.create(sf::VideoMode(menuSize, menuSize), "Bomberman");
+	m_window.create(sf::VideoMode(menuSize, menuSize), "Bomberman Main Menu");
 	sf::Font font;
 	if (!font.loadFromFile("Orange Kid.otf"))
 	{ 
@@ -292,17 +291,89 @@ void GameManager::drawBombs(std::vector<Bomb*>& m_bombs)
 	}
 }
 
+//void GameManager::explodeBomb(float x, float y)
+//{
+//	bool flag = true;
+//	std::vector<std::pair<float, float>> explosionArea = {
+//		{x, y}, {x + 1, y}, {x - 1, y}, {x, y + 1}, {x, y - 1},  // Explosion in 4 directions
+//		{x + 1, y + 1} , {x - 1, y + 1}, {x - 1, y - 1}, {x + 1, y - 1}
+//	};
+//
+//	int maxX = m_width / m_tileSize;
+//    int maxY = m_height / m_tileSize;
+//    int boardWidth = m_board[0].size();
+//
+//	for (auto& [ex, ey] : explosionArea)
+//	{int maxX = m_width / m_tileSize;
+//    int maxY = m_height / m_tileSize;
+//    int boardWidth = m_board[0].size();
+//		if (ex < 0 || ey < 0 || ex >= m_width / m_tileSize || ey >= m_height / m_tileSize)
+//			continue;
+//
+//		GameObject* obj = m_board[ey][ex];
+//
+//		if (!obj) continue;
+//
+//		switch (obj->getType())
+//		{
+//		case ROCK:  // Destroy rocks
+//			delete obj;
+//			m_board[ey][ex] = nullptr;
+//			break;
+//
+//		case GUARD:  // Remove guard from game
+//			for (int i = 0; !flag || i < m_guards.size(); i++) 
+//			{
+//
+//				sf::Vector2f currGuardPos(m_guards[i]->getSprite().getPosition());
+//
+//				float guardX = currGuardPos.x / m_tileSize;
+//				float guardY = currGuardPos.y / m_tileSize;
+//				std::cout << "Checking guard at (" << guardX << ", " << guardY << ") against explosion at (" << ex << ", " << ey << ")\n";
+//
+//
+//				if (m_guards[i]->getBounds().contains(ex * m_tileSize, ey * m_tileSize))
+//				{
+//					m_guards[i]->setDead();
+//
+//					std::cout << "Guard is dead\n";
+//
+//					m_guards[i]->draw();
+//					std::cout << "Guard dissapeared\n";
+//
+//					delete m_guards[i];
+//					m_guards[i] = nullptr; // Avoid dangling pointer
+//					m_guards.erase(m_guards.begin() + i);
+//					--i; // Adjust index after erasing
+//					flag = false;
+//				}
+//					
+//			}
+//			break;
+//		case PLAYER:  // Damage player
+//			m_player.lostLife();
+//			break;
+//
+//		default:
+//			break;
+//		}
+//	}
+//}
+
 void GameManager::explodeBomb(float x, float y)
 {
-	bool flag = true;
-	std::vector<std::pair<float, float>> explosionArea = {
-		{x, y}, {x + 1, y}, {x - 1, y}, {x, y + 1}, {x, y - 1},  // Explosion in 4 directions
-		{x + 1, y + 1} , {x - 1, y + 1}, {x - 1, y - 1}, {x + 1, y - 1}
+	std::vector<std::pair<int, int>> explosionArea = {
+		{x, y}, {x + 1, y}, {x - 1, y}, {x, y + 1}, {x, y - 1},
+		{x + 1, y + 1}, {x - 1, y + 1}, {x - 1, y - 1}, {x + 1, y - 1}
 	};
+
+	int maxRows = m_board.size();
+	int maxCols = (maxRows > 0) ? m_board[0].size() : 0;
 
 	for (auto& [ex, ey] : explosionArea)
 	{
-		if (ex < 0 || ey < 0 || ex >= m_width / m_tileSize || ey >= m_height / m_tileSize)
+		// Ensure indices are within bounds
+		if (ex < 0 || ey < 0 || ey >= maxRows || ex >= maxCols)
 			continue;
 
 		GameObject* obj = m_board[ey][ex];
@@ -311,41 +382,24 @@ void GameManager::explodeBomb(float x, float y)
 
 		switch (obj->getType())
 		{
-		case ROCK:  // Destroy rocks
+		case ROCK:
 			delete obj;
 			m_board[ey][ex] = nullptr;
 			break;
 
-		case GUARD:  // Remove guard from game
-			for (int i = 0; !flag || i < m_guards.size(); i++) 
+		case GUARD:
+			for (size_t i = 0; i < m_guards.size(); i++)
 			{
-
-				sf::Vector2f currGuardPos(m_guards[i]->getSprite().getPosition());
-
-				float guardX = currGuardPos.x / m_tileSize;
-				float guardY = currGuardPos.y / m_tileSize;
-				std::cout << "Checking guard at (" << guardX << ", " << guardY << ") against explosion at (" << ex << ", " << ey << ")\n";
-
-
 				if (m_guards[i]->getBounds().contains(ex * m_tileSize, ey * m_tileSize))
 				{
-					m_guards[i]->setDead();
-
-					std::cout << "Guard is dead\n";
-
-					m_guards[i]->draw();
-					std::cout << "Guard dissapeared\n";
-
 					delete m_guards[i];
-					m_guards[i] = nullptr; // Avoid dangling pointer
 					m_guards.erase(m_guards.begin() + i);
 					--i; // Adjust index after erasing
-					flag = false;
 				}
-					
 			}
 			break;
-		case PLAYER:  // Damage player
+
+		case PLAYER:
 			m_player.lostLife();
 			break;
 
@@ -412,13 +466,15 @@ void GameManager::runGame()
 				}
 
 				// Update game state
+				if (m_player.getLives() == 0)
+				{
+					//TODO: game over screen and exit
+				}
+
 				m_player.move(deltaTime, m_board, m_player);
 
 				for (auto& guard : m_guards) {
 					guard->move(deltaTime, m_board, m_player);
-					/*std::cout << "Guard position: "
-						<< guard->getSprite().getPosition().x << ", "
-						<< guard->getSprite().getPosition().y << std::endl;*/
 				}
 
 				if (m_currLeveldoor->getPassed())
@@ -437,5 +493,6 @@ void GameManager::runGame()
 				m_window.display();
 			}
 		}
+		//TODO: you win screen function with exit button
 	}
 }
