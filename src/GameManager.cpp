@@ -336,12 +336,11 @@ void GameManager::explodeBomb(float x, float y)
 					m_guards[i]->draw();
 					std::cout << "Guard dissapeared\n";
 
-
-					//delete m_guards[i];
-					//m_guards[i] = nullptr; // Avoid dangling pointer
-					//m_guards.erase(m_guards.begin() + i);
-					//--i; // Adjust index after erasing
-					//flag = false;
+					delete m_guards[i];
+					m_guards[i] = nullptr; // Avoid dangling pointer
+					m_guards.erase(m_guards.begin() + i);
+					--i; // Adjust index after erasing
+					flag = false;
 				}
 					
 			}

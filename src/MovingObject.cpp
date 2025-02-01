@@ -17,7 +17,7 @@ void MovingObject::moveSprite(const sf::Vector2f& offset)
 
 void MovingObject::move(sf::Time deltaTime, std::vector<std::vector<GameObject*>>& m_board, Player &player)
 {
-    const auto speedPerSecond = static_cast<float>(m_tileSize);
+    const auto speedPerSecond = static_cast<float>(m_tileSize * 1.5); //one and a half tiles per second
 
     // Calculate intended movement
     sf::Vector2f movement = m_direction * speedPerSecond * deltaTime.asSeconds();
