@@ -10,6 +10,7 @@
 #include "GlobalSizes.h"
 #include "Guard.h"
 #include "Bomb.h"
+#include "Door.h"
 
 class GameManager {
 public:
@@ -36,4 +37,6 @@ private:
 	sf::Font m_font;
 	sf::Clock m_clock;
 	std::vector<Bomb*> m_bombs;
+	Door* m_currLeveldoor = nullptr;
+	bool m_inGame = false;
 };

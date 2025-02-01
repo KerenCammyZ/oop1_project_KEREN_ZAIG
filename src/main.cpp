@@ -2,5 +2,5 @@
 int main()
 {
 	GameManager Bomberman;
-	Bomberman.runGame();
+	Bomberman.mainMenuScreen();
 }

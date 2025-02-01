@@ -106,6 +106,7 @@ void GameManager::drawLevel(int level)
 			case 'D':
 				gameObject = new Door(col * m_tileSize, m_tileSize + row * m_tileSize, m_window);
 				gameObject->setTexture(loadTexture("door.png"));
+                m_currLeveldoor = dynamic_cast<Door*>(gameObject);
 				break;
 			case '!':
 				gameObject = new Guard(m_window, sf::Vector2f(col * m_tileSize, m_tileSize + row * m_tileSize));
@@ -156,6 +157,17 @@ void GameManager::mainMenuScreen()
 			{
 			case sf::Event::Closed:
 				m_window.close();
+				break;
+			case sf::Event::MouseButtonPressed:
+				if (event.mouseButton.button == sf::Mouse::Left)
+				{
+					sf::Vector2f mousePos(event.mouseButton.x, event.mouseButton.y);
+					if (play.getGlobalBounds().contains(mousePos))
+					{
+						m_inGame = true;
+						runGame();
+					}
+				}
 				break;
 			default:
 				break;
@@ -346,65 +358,85 @@ void GameManager::explodeBomb(float x, float y)
 
 void GameManager::runGame() 
 {
-	// Load level
-	m_currLevel = 1;
-	drawLevel(m_currLevel);
-	m_window.setFramerateLimit(60);
 
-	//add toolbar
-	toolbar();
-
-	sf::Clock clock;
-
-	// Main game loop
-	while (m_window.isOpen()) 
+	if (m_inGame == false)
 	{
-		// Calculate delta time for this frame
-		const auto deltaTime = clock.restart();
+		mainMenuScreen();
+	}
+	else
+	{
+		m_currLevel = 1;
+		while (m_currLevel != 4)
+		{
+			// Load level
+			drawLevel(m_currLevel);
+			m_window.setFramerateLimit(60);
+			m_player.respawn();
 
-		// Process events
-		sf::Event event;
-		while (m_window.pollEvent(event)) {
-			switch (event.type) {
-			case sf::Event::Closed:
-				m_window.close();
-				break;
+			//add toolbar
+			toolbar();
 
-			case sf::Event::KeyPressed:
-				if (event.key.code == sf::Keyboard::B)
-				{		
-					Bomb* b = new Bomb(m_window, m_player.getSprite().getPosition().x, m_player.getSprite().getPosition().y);
-                    m_bombs.push_back(b);
-					std::cout << "Bomb placed at (" << m_player.getSprite().getPosition().x / m_tileSize << ", " << m_player.getSprite().getPosition().y / m_tileSize << ")" << std::endl;
-                   // m_board[m_player.getSprite().getPosition().y / m_tileSize][m_player.getSprite().getPosition().x / m_tileSize] = b;
+			sf::Clock clock;
+
+			// Main game loop
+			while (m_window.isOpen())
+			{
+
+				// Calculate delta time for this frame
+				const auto deltaTime = clock.restart();
+
+				// Process events
+				sf::Event event;
+				while (m_window.pollEvent(event)) {
+					switch (event.type) {
+					case sf::Event::Closed:
+						m_window.close();
+						return; // exit game
+						break;
+
+					case sf::Event::KeyPressed:
+						if (event.key.code == sf::Keyboard::B)
+						{
+							Bomb* b = new Bomb(m_window, m_player.getSprite().getPosition().x, m_player.getSprite().getPosition().y);
+							m_bombs.push_back(b);
+							std::cout << "Bomb placed at (" << m_player.getSprite().getPosition().x / m_tileSize << ", " << m_player.getSprite().getPosition().y / m_tileSize << ")" << std::endl;
+							// m_board[m_player.getSprite().getPosition().y / m_tileSize][m_player.getSprite().getPosition().x / m_tileSize] = b;
+						}
+						else
+							m_player.setDirection(event.key.code);
+
+						break;
+
+					default:
+						break;
+					}
 				}
-				else
-					m_player.setDirection(event.key.code);
-					
-				break;
 
-			default:
-				break;
+				// Update game state
+				m_player.move(deltaTime, m_board, m_player);
+
+				for (auto& guard : m_guards) {
+					guard->move(deltaTime, m_board, m_player);
+					/*std::cout << "Guard position: "
+						<< guard->getSprite().getPosition().x << ", "
+						<< guard->getSprite().getPosition().y << std::endl;*/
+				}
+
+				if (m_currLeveldoor->getPassed())
+				{
+					m_currLevel++;
+					m_window.close();
+				}
+
+				// Render the scene
+				m_window.clear(sf::Color::White);
+				drawBoard();
+				m_player.draw();
+				if (!m_bombs.empty())
+					drawBombs(m_bombs);
+				drawToolbar();
+				m_window.display();
 			}
 		}
-
-		// Update game state
-		m_player.move(deltaTime, m_board, m_player);
-		
-		for (auto& guard : m_guards) {
-			guard->move(deltaTime, m_board, m_player);
-			/*std::cout << "Guard position: "
-				<< guard->getSprite().getPosition().x << ", "
-				<< guard->getSprite().getPosition().y << std::endl;*/
-		}
-
-		// Render the scene
-		m_window.clear(sf::Color::White);
-		drawBoard();
-		m_player.draw(); 
-		if(!m_bombs.empty())
-			drawBombs(m_bombs);
-		drawToolbar();
-		m_window.display();
 	}
 }

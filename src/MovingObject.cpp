@@ -1,5 +1,6 @@
 #include "MovingObject.h"
 #include "Player.h"
+#include "Door.h"
 
 MovingObject::MovingObject(sf::RenderWindow& window, sf::Vector2f position) : GameObject(position.x, position.y, UNKNOWN, window){}
 
@@ -56,6 +57,15 @@ void MovingObject::move(sf::Time deltaTime, std::vector<std::vector<GameObject*>
                         // Block further checks for this object
                         canMove = false;
                     }
+                    else if (obj->getType() == DOOR) {
+                        // If the object is a Door, set its m_passed attribute to true
+                        Door* door = dynamic_cast<Door*>(obj);
+                        if (door) {
+                            door->setPassed(true);
+                        }
+                        // Allow movement through the door
+                        canMove = true;
+                    }
                 }
             }
         }
@@ -66,7 +76,6 @@ void MovingObject::move(sf::Time deltaTime, std::vector<std::vector<GameObject*>
         moveSprite(movement);
         m_position = movement;
     }
-
 
     // Reset direction if movement is blocked for too long
     if (m_direction != sf::Vector2f(0, 0) && m_movementTimer.getElapsedTime().asSeconds() > m_maxMovementTime) {
