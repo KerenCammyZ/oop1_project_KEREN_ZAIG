@@ -284,7 +284,6 @@ void GameManager::drawBombs(std::vector<Bomb*>& m_bombs)
 				{
 					m_player.lostLife();
 				}
-
 				delete m_bombs[i];
 				m_bombs[i] = nullptr; // Avoid dangling pointer
 				m_bombs.erase(m_bombs.begin() + i);
