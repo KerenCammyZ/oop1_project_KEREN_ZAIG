@@ -70,12 +70,12 @@ void Guard::move(sf::Time deltaTime, std::vector<std::vector<GameObject*>>& m_bo
     const auto speedPerSecond = static_cast<float>(m_tileSize);
 
     // Check if it's time to change direction
-    if (m_directionChangeClock.getElapsedTime().asSeconds() > rand() % 3 + 2) { // Random time between 2 and 6 seconds
-        changeDirection(player);  // Change direction after random time
+    if (m_directionChangeClock.getElapsedTime().asSeconds() > 6) { 
+        changeDirection(player);  //change direction after 5 seconds
         m_directionChangeClock.restart();  // Reset the clock
     }
 
-    // Calculate movement based on the current random direction
+    // Calculate movement based on the current direction
     sf::Vector2f movement = m_currentDirection * speedPerSecond * deltaTime.asSeconds();
 
     // Predict the new position of the sprite
