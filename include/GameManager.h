@@ -35,7 +35,7 @@ public:
 private:
 	std::vector<std::vector<GameObject*>> m_board;
 	sf::RenderWindow m_window;
-	int m_width = 0, m_height = 0, m_currLevel = 0, m_score = 0, m_levelNumGuards = 0;
+	int m_width = 0, m_height = 0, m_currLevel = 0, m_score = 0, m_levelNumGuards = 0, m_freezeStartTime = -1;
 	const int m_numOfLevels = 3;
 	std::unordered_map<std::string, sf::Texture> m_textures;
 	Player m_player;

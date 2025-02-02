@@ -153,9 +153,6 @@ void GameManager::drawLevel(int level)
 		std::mt19937 g(rd());
 		std::shuffle(emptyTiles.begin(), emptyTiles.end(), g);
 
-		// Random number generator for selecting power-up types
-		std::uniform_int_distribution<int> typeDist(0, 3); // Generates 0 to 3
-
 		// Select the first 4 empty positions for PowerUps
 		for (int i = 0; i < 4; i++) {
 			int row = emptyTiles[i].first;
@@ -163,7 +160,7 @@ void GameManager::drawLevel(int level)
 			float x = col * m_tileSize;
 			float y = m_tileSize + row * m_tileSize;
 
-			int randomNum = typeDist(g);
+			int randomNum = std::rand() % 4; //random num 0 to 3
 			PowerUp* powerUp = nullptr;
 
 			switch (randomNum)
@@ -178,6 +175,7 @@ void GameManager::drawLevel(int level)
 				break;
 			case 2:
 				powerUp = new PowerUp(x, y, FREEZE, m_window);
+				std::cout << "freeze powerup placed at " << x / m_tileSize << " " << y / m_tileSize << "\n";
 				powerUp->setTexture(loadTexture("freeze.png"));
 				break;
 			case 3:
@@ -459,16 +457,16 @@ void GameManager::activatePowerUps()
 				case TIME:
 					break;
 				case FREEZE:
-					if (!m_powers[i]->getActive() && m_player.getBounds().intersects(m_powers[i]->getBounds()))
+					if (m_player.getBounds().intersects(m_powers[i]->getBounds()) && !m_guardsFrozen)
 					{
 						m_powers[i]->activate();
 						setGuardsFrozen(true);
-					}
-					if (!m_powers[i]->isExpired())
-					{
-						setGuardsFrozen(false);
+						m_freezeStartTime = m_clock.getElapsedTime().asSeconds(); // Store freeze activation time
+						m_guardsFrozen = true;  // Mark that the freeze effect is active
 						deletePowerUp(i);
 					}
+					break;
+					
 					break;
 				case LIFE:
 					if (m_player.getBounds().intersects(m_powers[i]->getBounds()))
@@ -481,6 +479,12 @@ void GameManager::activatePowerUps()
 				}
 			
 		}
+	}
+	// Unfreeze guards after 5 seconds
+	if (m_guardsFrozen && m_clock.getElapsedTime().asSeconds() >= m_freezeStartTime + 5)
+	{
+		setGuardsFrozen(false);
+		m_guardsFrozen = false;  // Reset frozen state
 	}
 }
 
