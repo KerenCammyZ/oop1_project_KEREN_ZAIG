@@ -1,4 +1,4 @@
-﻿configure_file ("gameBackround.png" ${CMAKE_BINARY_DIR} COPYONLY)
+﻿#configure_file ("gameBackround.png" ${CMAKE_BINARY_DIR} COPYONLY)
 configure_file ("door.png" ${CMAKE_BINARY_DIR} COPYONLY)
 configure_file ("wall.png" ${CMAKE_BINARY_DIR} COPYONLY)
 configure_file ("rock.png" ${CMAKE_BINARY_DIR} COPYONLY)

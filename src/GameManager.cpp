@@ -447,12 +447,6 @@ void GameManager::runGame()
 		{
 			// Load level
 			drawLevel(m_currLevel); //TODO: delete m_guards at the start of each new level
-
-			//testing
-			PowerUp* p = new PowerUp(1 * m_tileSize, 3 *m_tileSize + m_tileSize, LIFE, m_window);
-			m_powers.push_back(p);
-			//testing
-
 			m_window.setFramerateLimit(60);
 			m_player.respawn();
 
@@ -501,6 +495,8 @@ void GameManager::runGame()
 
 				m_player.move(deltaTime, m_board, m_player);
 
+				activatePowerUps();
+
 				for (auto& guard : m_guards) {
 					guard->move(deltaTime, m_board, m_player);
 				}
@@ -511,10 +507,6 @@ void GameManager::runGame()
 					m_currLevel++;
 					m_window.close();
 				}
-
-				//testing
-				activatePowerUps();
-				//testing
 
 				// Render the scene
 				m_window.clear(sf::Color::White);
