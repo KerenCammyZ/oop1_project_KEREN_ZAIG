@@ -46,5 +46,6 @@ private:
 	sf::Clock m_clock;
 	std::vector<Bomb*> m_bombs;
 	Door* m_currLeveldoor = nullptr;
-	bool m_inGame = false, m_guardsFrozen = false;
+	bool m_inGame = false, m_guardsFrozen = false, m_timeLevel = false;
+	int m_extraTime = 0;
 };

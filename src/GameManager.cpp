@@ -99,6 +99,9 @@ void GameManager::drawLevel(int level)
 		}
 	}
 
+	//reset time if its a new level
+	m_timeLevel = false;
+
 	std::vector<std::pair<int, int>> emptyTiles; // Store empty tile positions
 
 	for (int row = 0; row < numRows; ++row) {
@@ -172,6 +175,7 @@ void GameManager::drawLevel(int level)
 			case 1:
 				powerUp = new PowerUp(x, y, TIME, m_window);
 				powerUp->setTexture(loadTexture("time.png"));
+				m_timeLevel = true; //make it a time level if this powerup appears
 				break;
 			case 2:
 				powerUp = new PowerUp(x, y, FREEZE, m_window);
@@ -188,6 +192,11 @@ void GameManager::drawLevel(int level)
 
 			m_powers.push_back(powerUp);
 		}
+	}
+
+	if (m_timeLevel)
+	{
+		m_clock.restart();
 	}
 }
 
@@ -291,8 +300,19 @@ void GameManager::drawToolbar()
 	m_helpText.setString("Help");
 	m_exitText.setString("Exit");
 
-	int minutes = m_clock.getElapsedTime().asSeconds() / 60;
-	int seconds = int(m_clock.getElapsedTime().asSeconds()) % 60;
+	int minutes = 0;
+	int seconds = 0;
+
+	if (m_timeLevel)
+	{
+		minutes = (3 * 60 - m_clock.getElapsedTime().asSeconds() + 1) / 60;
+		seconds = (3 * 60 - int(m_clock.getElapsedTime().asSeconds())) % 60;
+	}
+	else
+	{
+		minutes = m_clock.getElapsedTime().asSeconds() / 60;
+		seconds = int(m_clock.getElapsedTime().asSeconds()) % 60;
+	}
 	if(seconds < 10)
 		m_timeText.setString("Time: " + std::to_string(minutes) + ":0" + std::to_string(seconds));
 	else
@@ -440,7 +460,7 @@ void GameManager::activatePowerUps()
 		{
 			
 				ObjectType type = m_powers[i]->getType();
-
+				int addTime;
 				switch (type)
 				{
 				case DISSAPEAR:
@@ -455,6 +475,13 @@ void GameManager::activatePowerUps()
 					}
 					break;
 				case TIME:
+					if (m_player.getBounds().intersects(m_powers[i]->getBounds()))
+					{
+						// Add 3 minutes (180 seconds) to the countdown timer
+						m_extraTime = 180 + m_clock.getElapsedTime().asSeconds();
+						m_clock.restart();
+						deletePowerUp(i);
+					}
 					break;
 				case FREEZE:
 					if (m_player.getBounds().intersects(m_powers[i]->getBounds()) && !m_guardsFrozen)
@@ -538,6 +565,8 @@ void GameManager::runGame()
 			toolbar();
 
 			sf::Clock clock;
+			m_clock.restart();
+			m_extraTime = 0;
 
 			// Main game loop
 			while (m_window.isOpen())
@@ -572,35 +601,47 @@ void GameManager::runGame()
 				}
 
 				// Update game state
+
+				//check for game overs
+				int elapsedTime = m_clock.getElapsedTime().asSeconds();
+				if (m_timeLevel)
+				{
+					// TIMED LEVEL: Count down from 3 minutes + extra time
+					int timeLeft = (3 * 60 + m_extraTime) - elapsedTime;
+					if (timeLeft <= 0)
+					{
+						//game over
+					}
+				}
+				
 				if (m_player.getLives() == 0)
 				{
+					//game over here
 					//TODO: game over screen and exit
 				}
 
+				//no game over, do normal events
 				m_player.move(deltaTime, m_board, m_player);
-
 				activatePowerUps();
-
 				for (auto& guard : m_guards) {
 					guard->move(deltaTime, m_board, m_player);
 				}
-
 				if (m_currLeveldoor->getPassed())
 				{
 					m_score = 25 + (3 * m_levelNumGuards);
 					m_currLevel++;
 					m_window.close();
 				}
-
+				
 				// Render the scene
 				m_window.clear(sf::Color::White);
 				drawBoard();
-				drawGuards();
 				m_player.draw();
 				if (!m_bombs.empty())
 					drawBombs(m_bombs);
 				if (!m_powers.empty())
 					drawPowerUps(m_powers);
+				drawGuards();
 				drawToolbar();
 				m_window.display();
 			}
