@@ -11,8 +11,9 @@ public:
 	void draw() const override;
 	bool isAlive();
 	void setDead();
+	void setFrozen(bool freeze);
 private:
-	bool m_alive;
+	bool m_alive, m_frozen = false;
 	sf::Clock m_directionChangeClock;  // Timer to track the direction change
 	sf::Vector2f m_currentDirection;   // Current direction of the guard
 };

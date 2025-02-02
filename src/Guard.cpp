@@ -56,9 +56,17 @@ void Guard::setDead()
     m_alive = false;
 }
 
+void Guard::setFrozen(bool freeze)
+{
+    m_frozen = freeze;
+}
+
 void Guard::move(sf::Time deltaTime, std::vector<std::vector<GameObject*>>& m_board, Player &player)
 {
-    //old working version:
+    //dont move if frozen
+    if (m_frozen)
+        return;
+
     const auto speedPerSecond = static_cast<float>(m_tileSize);
 
     // Check if it's time to change direction

@@ -11,6 +11,7 @@
 #include "Guard.h"
 #include "Bomb.h"
 #include "Door.h"
+#include "PowerUp.h"
 
 class GameManager {
 public:
@@ -27,6 +28,9 @@ public:
 	void explodeBomb(float x, float y);
 	void drawGuards();
 	void killGuard(int i);
+	void activatePowerUps();
+	void setGuardsFrozen(bool freeze);
+	void deletePowerUp(int i);
 private:
 	std::vector<std::vector<GameObject*>> m_board;
 	sf::RenderWindow m_window;
@@ -35,10 +39,11 @@ private:
 	std::unordered_map<std::string, sf::Texture> m_textures;
 	Player m_player;
 	std::vector<Guard*> m_guards;
+	std::vector<PowerUp*> m_powers; 
 	sf::Text m_livesText, m_scoreText, m_levelText, m_helpText, m_exitText, m_timeText;
 	sf::Font m_font;
 	sf::Clock m_clock;
 	std::vector<Bomb*> m_bombs;
 	Door* m_currLeveldoor = nullptr;
-	bool m_inGame = false;
+	bool m_inGame = false, m_guardsFrozen = false;
 };

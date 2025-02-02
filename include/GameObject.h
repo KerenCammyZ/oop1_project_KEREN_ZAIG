@@ -34,4 +34,5 @@ protected:
 
 	friend class MovingObject;
 	friend class StaticObject;
+	friend class PowerUp;
 };

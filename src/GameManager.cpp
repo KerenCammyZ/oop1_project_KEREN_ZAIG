@@ -371,6 +371,68 @@ void GameManager::killGuard(int i)
 	m_score += 5;
 }
 
+void GameManager::activatePowerUps()
+{
+	if (!m_powers.empty())
+	{
+		for (int i = 0; i < m_powers.size(); i++)
+		{
+			
+				ObjectType type = m_powers[i]->getType();
+
+				switch (type)
+				{
+				case DISSAPEAR:
+					break;
+				case TIME:
+					break;
+				case FREEZE:
+					if (!m_powers[i]->getActive() && m_player.getBounds().intersects(m_powers[i]->getBounds()))
+					{
+						m_powers[i]->activate();
+						setGuardsFrozen(true);
+					}
+					if (!m_powers[i]->isExpired())
+					{
+						setGuardsFrozen(false);
+						deletePowerUp(i);
+					}
+					break;
+				case LIFE:
+					if (m_player.getBounds().intersects(m_powers[i]->getBounds()))
+					{
+						m_player.setLives(m_player.getLives() + 1);
+						deletePowerUp(i);
+					}
+					break;
+
+				}
+			
+		}
+	}
+}
+
+void GameManager::setGuardsFrozen(bool freeze)
+{
+	if (!m_guards.empty())
+	{
+		for (int i = 0; i < m_guards.size(); i++)
+		{
+			m_guards[i]->setFrozen(freeze);
+		}
+	}
+}
+
+void GameManager::deletePowerUp(int i)
+{
+	if (!m_powers.empty())
+	{
+		delete m_powers[i];
+		m_powers[i] = nullptr;
+		m_powers.erase(m_powers.begin() + i);
+	}
+}
+
 void GameManager::runGame() 
 {
 
@@ -385,6 +447,12 @@ void GameManager::runGame()
 		{
 			// Load level
 			drawLevel(m_currLevel); //TODO: delete m_guards at the start of each new level
+
+			//testing
+			PowerUp* p = new PowerUp(1 * m_tileSize, 3 *m_tileSize + m_tileSize, LIFE, m_window);
+			m_powers.push_back(p);
+			//testing
+
 			m_window.setFramerateLimit(60);
 			m_player.respawn();
 
@@ -443,6 +511,10 @@ void GameManager::runGame()
 					m_currLevel++;
 					m_window.close();
 				}
+
+				//testing
+				activatePowerUps();
+				//testing
 
 				// Render the scene
 				m_window.clear(sf::Color::White);

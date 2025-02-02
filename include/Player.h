@@ -7,6 +7,7 @@ public:
 	Player();	
 	void lostLife();
 	int getLives() const { return m_lives; }
+	void setLives(int lives) { m_lives = lives; }
 	void respawn();
 private:
 	int m_lives = 3;
