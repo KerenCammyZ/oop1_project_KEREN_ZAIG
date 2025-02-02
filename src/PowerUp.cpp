@@ -7,7 +7,7 @@ PowerUp::PowerUp(int x, int y, ObjectType type, sf::RenderWindow& window) : Stat
 
 void PowerUp::draw() const
 {
-	if (m_window && !m_active)
+	if (!m_active)
 	{
 		m_window->draw(m_sprite);
 	}

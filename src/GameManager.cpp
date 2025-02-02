@@ -5,6 +5,7 @@
 #include "Rock.h"
 #include "Door.h"
 #include "Bomb.h"
+#include <random>
 
 GameManager::GameManager() : m_player(m_window, sf::Vector2f(m_tileSize, m_tileSize)) {
 	m_width = 0;
@@ -54,30 +55,108 @@ void GameManager::drawBoard()
 	}
 }
 
+//void GameManager::drawLevel(int level)
+//{
+//	std::string fileName = "level" + std::to_string(level) + ".txt";
+//    std::ifstream file(fileName);
+//    if (!file) {
+//        std::cerr << "Cannot open level file: " << fileName << "\n";
+//        return;
+//    }
+//
+//    // Read the file into lines to determine the size
+//    std::vector<std::string> lines;
+//    std::string line;
+//    while (std::getline(file, line))
+//    {
+//        lines.push_back(line);
+//    }
+//
+//    // Initialize level dimensions
+//    int numRows = lines.size();
+//    int numCols = lines.empty() ? 0 : lines[0].size();
+//
+//    //set window size based on level
+//	int windowWidth = numCols * m_tileSize;
+//	int windowHeight = (numRows * m_tileSize); 
+//	m_window.create(sf::VideoMode(windowWidth, windowHeight + m_tileSize), "Bomberman");
+//	m_width = windowWidth;
+//	m_height = windowHeight + m_tileSize;
+//
+//	m_board.resize(numRows);
+//	for (auto& row : m_board) {
+//		row.resize(numCols, nullptr);
+//	}
+//
+//	for (int row = 0; row < numRows; ++row) {
+//		for (int col = 0; col < numCols; ++col) {
+//			char tile = lines[row][col];
+//			GameObject* gameObject = nullptr;
+//			Guard* g = nullptr;
+//
+//			switch (tile) {
+//			
+//			case '#':
+//				gameObject = new Wall(col * m_tileSize, m_tileSize + row * m_tileSize, m_window);
+//				gameObject->setTexture(loadTexture("wall.png"));
+//				break;
+//			case '@':
+//				gameObject = new Rock(col * m_tileSize, m_tileSize + row * m_tileSize, m_window);
+//				gameObject->setTexture(loadTexture("rock.png"));
+//				break;
+//			case 'D':
+//				gameObject = new Door(col * m_tileSize, m_tileSize + row * m_tileSize, m_window);
+//				gameObject->setTexture(loadTexture("door.png"));
+//                m_currLeveldoor = dynamic_cast<Door*>(gameObject);
+//				break;
+//			case '!':
+//				g = new Guard(m_window, sf::Vector2f(col * m_tileSize, m_tileSize + row * m_tileSize));
+//				g->setTexture(loadTexture("guard.png"));
+//				g->setType(GUARD);
+//				m_guards.push_back(g);
+//				break;
+//			default:
+//				break;
+//			}
+//
+//			m_board[row][col] = gameObject;
+//			if (gameObject) {
+//				if (!gameObject->getSprite().getTexture()) {
+//					std::cerr << "Error: object texture not set properly.\n";
+//				}
+//			}
+//		}
+//	}
+//
+//	if (!m_guards.empty())
+//		m_levelNumGuards = m_guards.size();
+//}
+
+
 void GameManager::drawLevel(int level)
 {
 	std::string fileName = "level" + std::to_string(level) + ".txt";
-    std::ifstream file(fileName);
-    if (!file) {
-        std::cerr << "Cannot open level file: " << fileName << "\n";
-        return;
-    }
+	std::ifstream file(fileName);
+	if (!file) {
+		std::cerr << "Cannot open level file: " << fileName << "\n";
+		return;
+	}
 
-    // Read the file into lines to determine the size
-    std::vector<std::string> lines;
-    std::string line;
-    while (std::getline(file, line))
-    {
-        lines.push_back(line);
-    }
+	// Read the file into lines to determine the size
+	std::vector<std::string> lines;
+	std::string line;
+	while (std::getline(file, line))
+	{
+		lines.push_back(line);
+	}
 
-    // Initialize level dimensions
-    int numRows = lines.size();
-    int numCols = lines.empty() ? 0 : lines[0].size();
+	// Initialize level dimensions
+	int numRows = lines.size();
+	int numCols = lines.empty() ? 0 : lines[0].size();
 
-    //set window size based on level
+	// Set window size based on level
 	int windowWidth = numCols * m_tileSize;
-	int windowHeight = (numRows * m_tileSize); 
+	int windowHeight = (numRows * m_tileSize);
 	m_window.create(sf::VideoMode(windowWidth, windowHeight + m_tileSize), "Bomberman");
 	m_width = windowWidth;
 	m_height = windowHeight + m_tileSize;
@@ -87,6 +166,8 @@ void GameManager::drawLevel(int level)
 		row.resize(numCols, nullptr);
 	}
 
+	std::vector<std::pair<int, int>> emptyTiles; // Store empty tile positions
+
 	for (int row = 0; row < numRows; ++row) {
 		for (int col = 0; col < numCols; ++col) {
 			char tile = lines[row][col];
@@ -94,7 +175,6 @@ void GameManager::drawLevel(int level)
 			Guard* g = nullptr;
 
 			switch (tile) {
-			
 			case '#':
 				gameObject = new Wall(col * m_tileSize, m_tileSize + row * m_tileSize, m_window);
 				gameObject->setTexture(loadTexture("wall.png"));
@@ -106,7 +186,7 @@ void GameManager::drawLevel(int level)
 			case 'D':
 				gameObject = new Door(col * m_tileSize, m_tileSize + row * m_tileSize, m_window);
 				gameObject->setTexture(loadTexture("door.png"));
-                m_currLeveldoor = dynamic_cast<Door*>(gameObject);
+				m_currLeveldoor = dynamic_cast<Door*>(gameObject);
 				break;
 			case '!':
 				g = new Guard(m_window, sf::Vector2f(col * m_tileSize, m_tileSize + row * m_tileSize));
@@ -115,19 +195,70 @@ void GameManager::drawLevel(int level)
 				m_guards.push_back(g);
 				break;
 			default:
+				// Track empty spots
+				emptyTiles.push_back({ row, col });
 				break;
 			}
 
 			m_board[row][col] = gameObject;
-			if (gameObject) {
-				if (!gameObject->getSprite().getTexture()) {
-					std::cerr << "Error: object texture not set properly.\n";
-				}
+			if (gameObject && !gameObject->getSprite().getTexture()) {
+				std::cerr << "Error: object texture not set properly.\n";
 			}
 		}
 	}
+
 	if (!m_guards.empty())
 		m_levelNumGuards = m_guards.size();
+
+	// ------------------------------
+	// ADD 4 RANDOM POWERUPS
+	// ------------------------------
+	m_powers.clear(); // Clear any existing power-ups
+
+	if (emptyTiles.size() >= 4) {
+		// Shuffle empty tile positions
+		std::random_device rd;
+		std::mt19937 g(rd());
+		std::shuffle(emptyTiles.begin(), emptyTiles.end(), g);
+
+		// Random number generator for selecting power-up types
+		std::uniform_int_distribution<int> typeDist(0, 3); // Generates 0 to 3
+
+		// Select the first 4 empty positions for PowerUps
+		for (int i = 0; i < 4; i++) {
+			int row = emptyTiles[i].first;
+			int col = emptyTiles[i].second;
+			float x = col * m_tileSize;
+			float y = m_tileSize + row * m_tileSize;
+
+			int randomNum = typeDist(g);
+			PowerUp* powerUp = nullptr;
+
+			switch (randomNum)
+			{
+			case 0:
+				powerUp = new PowerUp(x, y, DISSAPEAR, m_window);
+				powerUp->setTexture(loadTexture("Dissapear.png"));
+				break;
+			case 1:
+				powerUp = new PowerUp(x, y, TIME, m_window);
+				powerUp->setTexture(loadTexture("Time.png"));
+				break;
+			case 2:
+				powerUp = new PowerUp(x, y, FREEZE, m_window);
+				powerUp->setTexture(loadTexture("Freeze.png"));
+				break;
+			case 3:
+				powerUp = new PowerUp(x, y, LIFE, m_window);
+				powerUp->setTexture(loadTexture("Life.png"));
+				break;
+			default:
+				break;
+			}
+
+			m_powers.push_back(powerUp);
+		}
+	}
 }
 
 void GameManager::mainMenuScreen()
@@ -433,6 +564,14 @@ void GameManager::deletePowerUp(int i)
 	}
 }
 
+void GameManager::drawPowerUps(const std::vector<PowerUp*>& m_powers)
+{
+	for (int i = 0; i < m_powers.size(); i++)
+	{
+		m_powers[i]->draw();
+	}
+}
+
 void GameManager::runGame() 
 {
 
@@ -495,7 +634,7 @@ void GameManager::runGame()
 
 				m_player.move(deltaTime, m_board, m_player);
 
-				activatePowerUps();
+				//activatePowerUps();
 
 				for (auto& guard : m_guards) {
 					guard->move(deltaTime, m_board, m_player);
@@ -515,6 +654,8 @@ void GameManager::runGame()
 				m_player.draw();
 				if (!m_bombs.empty())
 					drawBombs(m_bombs);
+				if (!m_powers.empty())
+					drawPowerUps(m_powers);
 				drawToolbar();
 				m_window.display();
 			}
