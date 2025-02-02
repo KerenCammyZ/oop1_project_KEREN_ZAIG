@@ -55,84 +55,6 @@ void GameManager::drawBoard()
 	}
 }
 
-//void GameManager::drawLevel(int level)
-//{
-//	std::string fileName = "level" + std::to_string(level) + ".txt";
-//    std::ifstream file(fileName);
-//    if (!file) {
-//        std::cerr << "Cannot open level file: " << fileName << "\n";
-//        return;
-//    }
-//
-//    // Read the file into lines to determine the size
-//    std::vector<std::string> lines;
-//    std::string line;
-//    while (std::getline(file, line))
-//    {
-//        lines.push_back(line);
-//    }
-//
-//    // Initialize level dimensions
-//    int numRows = lines.size();
-//    int numCols = lines.empty() ? 0 : lines[0].size();
-//
-//    //set window size based on level
-//	int windowWidth = numCols * m_tileSize;
-//	int windowHeight = (numRows * m_tileSize); 
-//	m_window.create(sf::VideoMode(windowWidth, windowHeight + m_tileSize), "Bomberman");
-//	m_width = windowWidth;
-//	m_height = windowHeight + m_tileSize;
-//
-//	m_board.resize(numRows);
-//	for (auto& row : m_board) {
-//		row.resize(numCols, nullptr);
-//	}
-//
-//	for (int row = 0; row < numRows; ++row) {
-//		for (int col = 0; col < numCols; ++col) {
-//			char tile = lines[row][col];
-//			GameObject* gameObject = nullptr;
-//			Guard* g = nullptr;
-//
-//			switch (tile) {
-//			
-//			case '#':
-//				gameObject = new Wall(col * m_tileSize, m_tileSize + row * m_tileSize, m_window);
-//				gameObject->setTexture(loadTexture("wall.png"));
-//				break;
-//			case '@':
-//				gameObject = new Rock(col * m_tileSize, m_tileSize + row * m_tileSize, m_window);
-//				gameObject->setTexture(loadTexture("rock.png"));
-//				break;
-//			case 'D':
-//				gameObject = new Door(col * m_tileSize, m_tileSize + row * m_tileSize, m_window);
-//				gameObject->setTexture(loadTexture("door.png"));
-//                m_currLeveldoor = dynamic_cast<Door*>(gameObject);
-//				break;
-//			case '!':
-//				g = new Guard(m_window, sf::Vector2f(col * m_tileSize, m_tileSize + row * m_tileSize));
-//				g->setTexture(loadTexture("guard.png"));
-//				g->setType(GUARD);
-//				m_guards.push_back(g);
-//				break;
-//			default:
-//				break;
-//			}
-//
-//			m_board[row][col] = gameObject;
-//			if (gameObject) {
-//				if (!gameObject->getSprite().getTexture()) {
-//					std::cerr << "Error: object texture not set properly.\n";
-//				}
-//			}
-//		}
-//	}
-//
-//	if (!m_guards.empty())
-//		m_levelNumGuards = m_guards.size();
-//}
-
-
 void GameManager::drawLevel(int level)
 {
 	std::string fileName = "level" + std::to_string(level) + ".txt";
@@ -164,6 +86,17 @@ void GameManager::drawLevel(int level)
 	m_board.resize(numRows);
 	for (auto& row : m_board) {
 		row.resize(numCols, nullptr);
+	}
+
+	//reset guards if its a new level
+	if (!m_guards.empty())
+	{
+		for (int i = 0; i < m_guards.size(); i++)
+		{
+			delete m_guards[i];
+			m_guards[i] = nullptr;
+			m_guards.erase(m_guards.begin() + i);
+		}
 	}
 
 	std::vector<std::pair<int, int>> emptyTiles; // Store empty tile positions
@@ -210,9 +143,8 @@ void GameManager::drawLevel(int level)
 	if (!m_guards.empty())
 		m_levelNumGuards = m_guards.size();
 
-	// ------------------------------
+	
 	// ADD 4 RANDOM POWERUPS
-	// ------------------------------
 	m_powers.clear(); // Clear any existing power-ups
 
 	if (emptyTiles.size() >= 4) {
@@ -238,19 +170,19 @@ void GameManager::drawLevel(int level)
 			{
 			case 0:
 				powerUp = new PowerUp(x, y, DISSAPEAR, m_window);
-				powerUp->setTexture(loadTexture("Dissapear.png"));
+				powerUp->setTexture(loadTexture("dissapear.png"));
 				break;
 			case 1:
 				powerUp = new PowerUp(x, y, TIME, m_window);
-				powerUp->setTexture(loadTexture("Time.png"));
+				powerUp->setTexture(loadTexture("time.png"));
 				break;
 			case 2:
 				powerUp = new PowerUp(x, y, FREEZE, m_window);
-				powerUp->setTexture(loadTexture("Freeze.png"));
+				powerUp->setTexture(loadTexture("freeze.png"));
 				break;
 			case 3:
 				powerUp = new PowerUp(x, y, LIFE, m_window);
-				powerUp->setTexture(loadTexture("Life.png"));
+				powerUp->setTexture(loadTexture("life.png"));
 				break;
 			default:
 				break;
@@ -514,6 +446,15 @@ void GameManager::activatePowerUps()
 				switch (type)
 				{
 				case DISSAPEAR:
+					if (m_player.getBounds().intersects(m_powers[i]->getBounds()))
+					{
+						if (!m_guards.empty())
+						{
+							int randNum = std::rand() % m_guards.size();
+							killGuard(randNum);
+						}
+						deletePowerUp(i);
+					}
 					break;
 				case TIME:
 					break;
@@ -634,7 +575,7 @@ void GameManager::runGame()
 
 				m_player.move(deltaTime, m_board, m_player);
 
-				//activatePowerUps();
+				activatePowerUps();
 
 				for (auto& guard : m_guards) {
 					guard->move(deltaTime, m_board, m_player);
