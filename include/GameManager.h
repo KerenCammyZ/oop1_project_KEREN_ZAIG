@@ -32,6 +32,8 @@ public:
 	void setGuardsFrozen(bool freeze);
 	void deletePowerUp(int i);
 	void drawPowerUps(const std::vector<PowerUp*>& m_powers);
+	void endScreen(bool flag);
+
 private:
 	std::vector<std::vector<GameObject*>> m_board;
 	sf::RenderWindow m_window;

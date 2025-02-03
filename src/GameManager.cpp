@@ -544,6 +544,54 @@ void GameManager::drawPowerUps(const std::vector<PowerUp*>& m_powers)
 	}
 }
 
+void GameManager::endScreen(bool flag)
+{
+
+	int menuSize = 500;
+	m_window.create(sf::VideoMode(menuSize, menuSize), "Bomberman Main Menu");
+	sf::Font font;
+	if (!font.loadFromFile("Orange Kid.otf"))
+	{
+		std::cerr << "Cannot load font\n";
+	}
+
+	sf::Text text;
+	text.setFont(font);
+	text.setFillColor(sf::Color::Black);
+	if (flag)
+		text.setString("YOU WON!");
+	else
+	{
+		text.setString("YOU LOSE");
+	}
+	text.setCharacterSize(150);
+	int centerX = (menuSize / 2) - text.getGlobalBounds().width / 2;
+	int centerY = (menuSize / 2) - text.getGlobalBounds().height;
+	text.setPosition(sf::Vector2f(centerX, centerY - 20));
+
+
+	while (m_window.isOpen())
+	{
+		sf::Event event;
+		while (m_window.pollEvent(event))
+		{
+			switch (event.type)
+			{
+			case sf::Event::Closed:
+				m_window.close();
+				exit(EXIT_SUCCESS);
+				break;
+			default:
+				break;
+			}
+		}
+
+		m_window.clear(sf::Color::White);
+		m_window.draw(text);
+		m_window.display();
+	}
+}
+
 void GameManager::runGame() 
 {
 
@@ -610,14 +658,13 @@ void GameManager::runGame()
 					int timeLeft = (3 * 60 + m_extraTime) - elapsedTime;
 					if (timeLeft <= 0)
 					{
-						//game over
+						endScreen(false);
 					}
 				}
 				
 				if (m_player.getLives() == 0)
 				{
-					//game over here
-					//TODO: game over screen and exit
+					endScreen(false);
 				}
 
 				//no game over, do normal events
@@ -646,6 +693,6 @@ void GameManager::runGame()
 				m_window.display();
 			}
 		}
-		//TODO: you win screen function with exit button
+		endScreen(true);
 	}
 }
