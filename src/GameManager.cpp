@@ -589,19 +589,24 @@ void GameManager::endScreen(bool flag)
 		std::cerr << "Cannot load font\n";
 	}
 
-	sf::Text text;
+	sf::Text text, playAgain;
 	text.setFont(font);
+	playAgain.setFont(font);
 	text.setFillColor(sf::Color::Black);
+	playAgain.setFillColor(sf::Color::Black);
 	if (flag)
 		text.setString("YOU WON!");
 	else
 	{
 		text.setString("YOU LOSE");
 	}
+	playAgain.setString("Play Again");
 	text.setCharacterSize(150);
+	playAgain.setCharacterSize(100);
 	int centerX = (menuSize / 2) - text.getGlobalBounds().width / 2;
 	int centerY = (menuSize / 2) - text.getGlobalBounds().height;
 	text.setPosition(sf::Vector2f(centerX, centerY - 20));
+	playAgain.setPosition(sf::Vector2f(centerX, centerY - 100));
 
 
 	while (m_window.isOpen())
@@ -615,6 +620,17 @@ void GameManager::endScreen(bool flag)
 				m_window.close();
 				exit(EXIT_SUCCESS);
 				break;
+			case sf::Event::MouseButtonPressed:
+				if (event.mouseButton.button == sf::Mouse::Left)
+				{
+					sf::Vector2f mousePos(event.mouseButton.x, event.mouseButton.y);
+					if (playAgain.getGlobalBounds().contains(mousePos))
+					{
+						startNewGame();
+						mainMenuScreen();
+					}
+				}
+				break;
 			default:
 				break;
 			}
@@ -622,6 +638,7 @@ void GameManager::endScreen(bool flag)
 
 		m_window.clear(sf::Color::White);
 		m_window.draw(text);
+		m_window.draw(playAgain);
 		m_window.display();
 	}
 }
@@ -822,6 +839,11 @@ void GameManager::runGame()
 }
 
 void GameManager::startNewGame() {
+
+	// Close the existing window
+	if (m_window.isOpen()) {
+		m_window.close();
+	}
 	// Reset player stats
 	m_player.setLives(3);  // Set default lives
 	m_score = 0;           // Reset score
@@ -852,6 +874,5 @@ void GameManager::startNewGame() {
 	// Reset clock
 	m_clock.restart();
 
-	// Load first level
-	drawLevel(m_currLevel);
+	m_inGame = false;
 }
