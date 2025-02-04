@@ -875,4 +875,5 @@ void GameManager::startNewGame() {
 	m_clock.restart();
 
 	m_inGame = false;
+	m_currLeveldoor->setPassed(false);
 }
