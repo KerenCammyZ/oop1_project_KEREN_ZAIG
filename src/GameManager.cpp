@@ -216,17 +216,16 @@ void GameManager::drawLevel(int level)
 
 void GameManager::mainMenuScreen()
 {
-	int menuSize = 500;
+	int menuSize = 1000;
 	m_window.create(sf::VideoMode(menuSize, menuSize), "Bomberman Main Menu");
-	sf::Music music;
-	if (!music.openFromFile("mainMenuMusic.ogg"))
+	if (!m_mainMenuMusic.openFromFile("mainMenuMusic.ogg"))
 	{
 		std::cerr << "Can't load main menu music\n";
 	}
-	music.setLoopPoints({sf::milliseconds(500), sf::seconds(114)});
-	music.setLoop(true);
-	music.setVolume(10.f);
-	music.play();
+	m_mainMenuMusic.setLoopPoints({sf::milliseconds(500), sf::seconds(114)});
+	m_mainMenuMusic.setLoop(true);
+	m_mainMenuMusic.setVolume(10.f);
+	m_mainMenuMusic.play();
 	
 
 	sf::Font font;
@@ -235,14 +234,19 @@ void GameManager::mainMenuScreen()
 		std::cerr << "Cannot load font\n";
 	}
 
-	sf::Text play;
+	sf::Text play, help;
 	play.setFont(font);
+	help.setFont(font);
 	play.setFillColor(sf::Color::Black);
+	help.setFillColor(sf:: Color::Black);
 	play.setString("PLAY");
+	help.setString("HELP");
 	play.setCharacterSize(150);
+	help.setCharacterSize(100);
 	int centerX = (menuSize / 2) - play.getGlobalBounds().width / 2;
 	int centerY = (menuSize / 2) - play.getGlobalBounds().height;
 	play.setPosition(sf::Vector2f(centerX,centerY - 20));
+	help.setPosition(sf::Vector2f(centerX + 50, centerY + 200));
 
 	
 	while (m_window.isOpen())
@@ -262,8 +266,12 @@ void GameManager::mainMenuScreen()
 					if (play.getGlobalBounds().contains(mousePos))
 					{
 						m_inGame = true;
-						music.stop();
+						m_mainMenuMusic.stop();
 						runGame();
+					}
+					if (help.getGlobalBounds().contains(mousePos))
+					{
+						helpScreen();
 					}
 				}
 				break;
@@ -274,6 +282,7 @@ void GameManager::mainMenuScreen()
 
 		m_window.clear(sf::Color::White);
 		m_window.draw(play);
+		m_window.draw(help);
 		m_window.display();
 	}
 }
@@ -283,21 +292,18 @@ void GameManager::toolbar()
 	m_livesText.setFont(m_font);
 	m_scoreText.setFont(m_font);
 	m_levelText.setFont(m_font);
-	m_helpText.setFont(m_font);
 	m_exitText.setFont(m_font);
 	m_timeText.setFont(m_font);
 
 	m_livesText.setFillColor(sf::Color::Black);
 	m_scoreText.setFillColor(sf::Color::Black);
 	m_levelText.setFillColor(sf::Color::Black);
-	m_helpText.setFillColor(sf::Color::Black);
 	m_exitText.setFillColor(sf::Color::Black);
 	m_timeText.setFillColor(sf::Color::Black);
 
 	m_livesText.setCharacterSize(70);
 	m_scoreText.setCharacterSize(70);
 	m_levelText.setCharacterSize(70);
-	m_helpText.setCharacterSize(70);
 	m_exitText.setCharacterSize(70);
 	m_timeText.setCharacterSize(70);
 
@@ -307,8 +313,7 @@ void GameManager::toolbar()
 	m_livesText.setPosition(sf::Vector2f(toolbarX + (5 *m_tileSize), toolbarY));
 	m_scoreText.setPosition(sf::Vector2f(toolbarX + (10 * m_tileSize), toolbarY));
 	m_timeText.setPosition(sf::Vector2f(toolbarX + (15 * m_tileSize), toolbarY));
-	m_helpText.setPosition(sf::Vector2f(toolbarX + (20 * m_tileSize), toolbarY));
-	m_exitText.setPosition(sf::Vector2f(toolbarX + (25 * m_tileSize), toolbarY));
+	m_exitText.setPosition(sf::Vector2f(toolbarX + (20 * m_tileSize), toolbarY));
 
 }
 
@@ -323,7 +328,6 @@ void GameManager::drawToolbar()
 	m_livesText.setString("Lives: " + std::to_string(m_player.getLives()));
 	m_scoreText.setString("Score: " + std::to_string(m_score));
 	m_levelText.setString("Level: " + std::to_string(m_currLevel));
-	m_helpText.setString("Help");
 	m_exitText.setString("Exit");
 
 	int minutes = 0;
@@ -347,7 +351,6 @@ void GameManager::drawToolbar()
 	m_window.draw(m_livesText);
 	m_window.draw(m_scoreText);
 	m_window.draw(m_levelText);
-	m_window.draw(m_helpText);
 	m_window.draw(m_exitText);
 	m_window.draw(m_timeText);
 }
@@ -578,8 +581,8 @@ void GameManager::drawPowerUps(const std::vector<PowerUp*>& m_powers)
 void GameManager::endScreen(bool flag)
 {
 
-	int menuSize = 500;
-	m_window.create(sf::VideoMode(menuSize, menuSize), "Bomberman Main Menu");
+	int menuSize = 1000;
+	m_window.create(sf::VideoMode(menuSize, menuSize), "Bomberman");
 	sf::Font font;
 	if (!font.loadFromFile("Orange Kid.otf"))
 	{
@@ -623,6 +626,70 @@ void GameManager::endScreen(bool flag)
 	}
 }
 
+void GameManager::helpScreen()
+{
+	int menuSize = 1000;
+	m_window.create(sf::VideoMode(menuSize, menuSize), "How to Play");
+	sf::Font font;
+	if (!font.loadFromFile("Orange Kid.otf"))
+	{
+		std::cerr << "Cannot load font\n";
+	}
+
+	sf::Text PLAY;
+	PLAY.setFont(font);
+	PLAY.setCharacterSize(100);
+	
+	int centerTitleX = (menuSize / 2) - (PLAY.getGlobalBounds().width / 2) - 80;
+
+	PLAY.setPosition(centerTitleX, menuSize - 150);
+	PLAY.setString("PLAY");
+	PLAY.setFillColor(sf::Color::Black);
+
+	sf::Texture backroundTexture;
+	if (!backroundTexture.loadFromFile("HELP SCREEN.png"))
+	{
+		std::cerr << "Cannot load HELP SCREEN\n";
+	}
+	sf::Sprite backround;
+	backround.setTexture(backroundTexture);
+	
+	while (m_window.isOpen())
+	{
+		sf::Event event;
+		while (m_window.pollEvent(event))
+		{
+			switch (event.type)
+			{
+			case sf::Event::Closed:
+				m_window.close();
+				exit(EXIT_SUCCESS);
+				break;
+			case sf::Event::MouseButtonPressed:
+				if (event.mouseButton.button == sf::Mouse::Left)
+				{
+					sf::Vector2f mousePos(event.mouseButton.x, event.mouseButton.y);
+					if (PLAY.getGlobalBounds().contains(mousePos))
+					{
+						m_inGame = true;
+						m_mainMenuMusic.stop();
+						runGame();
+					}
+				}
+				break;
+			default:
+				break;
+			}
+		}
+
+		m_window.clear(sf::Color::White);
+		m_window.draw(backround);
+		m_window.draw(PLAY);
+		m_window.display();
+	}
+
+}
+
 void GameManager::runGame() 
 {
 
@@ -636,12 +703,14 @@ void GameManager::runGame()
 		sf::Music music;
 		if (!music.openFromFile("inGameMusic.ogg"))
 		{
-			std::cerr << "Can't load main menu music\n";
+			std::cerr << "Can't load in game music\n";
 		}
 		music.setLoopPoints({ sf::milliseconds(500), sf::seconds(84) });
 		music.setLoop(true);
 		music.setVolume(5.f);
 		music.play();
+
+
 		while (m_currLevel != 4)
 		{
 
@@ -649,6 +718,8 @@ void GameManager::runGame()
 			drawLevel(m_currLevel); //TODO: delete m_guards at the start of each new level
 			m_window.setFramerateLimit(60);
 			m_player.respawn();
+			
+			m_gameBackround.setTexture(loadTexture("gameBackround.png"));
 
 			//add toolbar
 			toolbar();
@@ -733,6 +804,7 @@ void GameManager::runGame()
 				
 				// Render the scene
 				m_window.clear(sf::Color::White);
+				m_window.draw(m_gameBackround);
 				drawBoard();
 				m_player.draw();
 				if (!m_bombs.empty())
@@ -747,4 +819,39 @@ void GameManager::runGame()
 		music.stop();
 		endScreen(true);
 	}
+}
+
+void GameManager::startNewGame() {
+	// Reset player stats
+	m_player.setLives(3);  // Set default lives
+	m_score = 0;           // Reset score
+	m_currLevel = 1;       // Start at level 1
+	m_timeLevel = false;
+
+	// Clear existing game objects
+	for (auto& row : m_board) {
+		for (auto& obj : row) {
+			delete obj;
+			obj = nullptr;
+		}
+	}
+	m_board.clear();
+
+	// Clear guards
+	for (auto& guard : m_guards) {
+		delete guard;
+	}
+	m_guards.clear();
+
+	// Clear power-ups
+	for (auto& powerUp : m_powers) {
+		delete powerUp;
+	}
+	m_powers.clear();
+
+	// Reset clock
+	m_clock.restart();
+
+	// Load first level
+	drawLevel(m_currLevel);
 }

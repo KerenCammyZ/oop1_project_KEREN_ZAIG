@@ -21,6 +21,7 @@ public:
 	const sf::Texture& loadTexture(const std::string& texturePath);
 	const sf::SoundBuffer& loadSoundBuffer(const std::string& soundBufferPath);
 	void runGame();
+	void startNewGame();
 	void drawBoard();
 	void drawLevel(int currLevel);
 	void mainMenuScreen();
@@ -35,7 +36,7 @@ public:
 	void deletePowerUp(int i);
 	void drawPowerUps(const std::vector<PowerUp*>& m_powers);
 	void endScreen(bool flag);
-
+	void helpScreen();
 private:
 	std::vector<std::vector<GameObject*>> m_board;
 	sf::RenderWindow m_window;
@@ -46,7 +47,7 @@ private:
 	Player m_player;
 	std::vector<Guard*> m_guards;
 	std::vector<PowerUp*> m_powers; 
-	sf::Text m_livesText, m_scoreText, m_levelText, m_helpText, m_exitText, m_timeText;
+	sf::Text m_livesText, m_scoreText, m_levelText, m_exitText, m_timeText;
 	sf::Font m_font;
 	sf::Clock m_clock;
 	std::vector<Bomb*> m_bombs;
@@ -54,5 +55,6 @@ private:
 	bool m_inGame = false, m_guardsFrozen = false, m_timeLevel = false;
 	int m_extraTime = 0;
 	sf::Sound m_powerupSound, m_explosionSound, m_levelUpSound, m_gameOverSound;
-	sf::Music m_mainMenuMusic, m_inGameMusic, m_gameOverMusic;
+	sf::Music m_mainMenuMusic;
+	sf::Sprite m_gameBackround;
 };
