@@ -42,6 +42,21 @@ const sf::Texture& GameManager::loadTexture(const std::string& texturePath) {
 	return m_textures[texturePath];
 }
 
+const sf::SoundBuffer& GameManager::loadSoundBuffer(const std::string& soundBufferPath)
+{
+	//simaler checks to loadTexture but with sound buffer
+	if (m_sounds.find(soundBufferPath) == m_sounds.end())
+	{
+		sf::SoundBuffer sound;
+		if (!sound.loadFromFile(soundBufferPath))
+		{
+			std::cerr << "Error loading sound buffer: " << soundBufferPath << "\n";
+		}
+		m_sounds[soundBufferPath] = std::move(sound);
+	}
+	return m_sounds[soundBufferPath];
+}
+
 void GameManager::drawBoard()
 {
 	if (m_window.isOpen() && !m_board.empty()) {
@@ -179,7 +194,6 @@ void GameManager::drawLevel(int level)
 				break;
 			case 2:
 				powerUp = new PowerUp(x, y, FREEZE, m_window);
-				std::cout << "freeze powerup placed at " << x / m_tileSize << " " << y / m_tileSize << "\n";
 				powerUp->setTexture(loadTexture("freeze.png"));
 				break;
 			case 3:
@@ -204,6 +218,17 @@ void GameManager::mainMenuScreen()
 {
 	int menuSize = 500;
 	m_window.create(sf::VideoMode(menuSize, menuSize), "Bomberman Main Menu");
+	sf::Music music;
+	if (!music.openFromFile("mainMenuMusic.ogg"))
+	{
+		std::cerr << "Can't load main menu music\n";
+	}
+	music.setLoopPoints({sf::milliseconds(500), sf::seconds(114)});
+	music.setLoop(true);
+	music.setVolume(10.f);
+	music.play();
+	
+
 	sf::Font font;
 	if (!font.loadFromFile("Orange Kid.otf"))
 	{ 
@@ -237,6 +262,7 @@ void GameManager::mainMenuScreen()
 					if (play.getGlobalBounds().contains(mousePos))
 					{
 						m_inGame = true;
+						music.stop();
 						runGame();
 					}
 				}
@@ -354,6 +380,7 @@ void GameManager::drawBombs(std::vector<Bomb*>& m_bombs)
 				break;
 			case 5:
 				m_bombs[i]->setTexture(loadTexture("explosion.png"));
+				
 				break;
 			default:
 				sf::Vector2f bombPos = m_bombs[i]->getPosition();
@@ -380,6 +407,9 @@ void GameManager::drawBombs(std::vector<Bomb*>& m_bombs)
 
 void GameManager::explodeBomb(float x, float y)
 {
+	m_explosionSound.setBuffer(loadSoundBuffer("explosion.ogg"));
+	m_explosionSound.setVolume(10.f);
+	m_explosionSound.play();
 	std::vector<std::pair<int, int>> explosionArea = {
 		{x, y}, {x + 1, y}, {x - 1, y}, {x, y + 1}, {x, y - 1},
 		{x + 1, y + 1}, {x - 1, y + 1}, {x - 1, y - 1}, {x + 1, y - 1}
@@ -458,52 +488,53 @@ void GameManager::activatePowerUps()
 	{
 		for (int i = 0; i < m_powers.size(); i++)
 		{
-			
-				ObjectType type = m_powers[i]->getType();
-				int addTime;
+
+			ObjectType type = m_powers[i]->getType();
+			int addTime;
+			if (m_player.getBounds().intersects(m_powers[i]->getBounds()))
+			{
 				switch (type)
 				{
 				case DISSAPEAR:
-					if (m_player.getBounds().intersects(m_powers[i]->getBounds()))
+
+					if (!m_guards.empty())
 					{
-						if (!m_guards.empty())
-						{
-							int randNum = std::rand() % m_guards.size();
-							killGuard(randNum);
-						}
-						deletePowerUp(i);
+						int randNum = std::rand() % m_guards.size();
+						killGuard(randNum);
 					}
+					deletePowerUp(i);
+
 					break;
 				case TIME:
-					if (m_player.getBounds().intersects(m_powers[i]->getBounds()))
-					{
-						// Add 3 minutes (180 seconds) to the countdown timer
-						m_extraTime = 180 + m_clock.getElapsedTime().asSeconds();
-						m_clock.restart();
-						deletePowerUp(i);
-					}
+
+					// Add 3 minutes (180 seconds) to the countdown timer
+					m_extraTime = 180 + m_clock.getElapsedTime().asSeconds();
+					m_clock.restart();
+					deletePowerUp(i);
+
 					break;
 				case FREEZE:
-					if (m_player.getBounds().intersects(m_powers[i]->getBounds()) && !m_guardsFrozen)
-					{
-						m_powers[i]->activate();
-						setGuardsFrozen(true);
-						m_freezeStartTime = m_clock.getElapsedTime().asSeconds(); // Store freeze activation time
-						m_guardsFrozen = true;  // Mark that the freeze effect is active
-						deletePowerUp(i);
-					}
+
+					m_powers[i]->activate();
+					setGuardsFrozen(true);
+					m_freezeStartTime = m_clock.getElapsedTime().asSeconds(); // Store freeze activation time
+					m_guardsFrozen = true;  // Mark that the freeze effect is active
+					deletePowerUp(i);
+
 					break;
-					
+
 					break;
 				case LIFE:
-					if (m_player.getBounds().intersects(m_powers[i]->getBounds()))
-					{
-						m_player.setLives(m_player.getLives() + 1);
-						deletePowerUp(i);
-					}
+
+					m_player.setLives(m_player.getLives() + 1);
+					deletePowerUp(i);
+
 					break;
 
 				}
+				m_powerupSound.setBuffer(loadSoundBuffer("powerup.ogg"));
+				m_powerupSound.play();
+			}
 			
 		}
 	}
@@ -602,8 +633,18 @@ void GameManager::runGame()
 	else
 	{
 		m_currLevel = 1;
+		sf::Music music;
+		if (!music.openFromFile("inGameMusic.ogg"))
+		{
+			std::cerr << "Can't load main menu music\n";
+		}
+		music.setLoopPoints({ sf::milliseconds(500), sf::seconds(84) });
+		music.setLoop(true);
+		music.setVolume(5.f);
+		music.play();
 		while (m_currLevel != 4)
 		{
+
 			// Load level
 			drawLevel(m_currLevel); //TODO: delete m_guards at the start of each new level
 			m_window.setFramerateLimit(60);
@@ -622,7 +663,7 @@ void GameManager::runGame()
 
 				// Calculate delta time for this frame
 				const auto deltaTime = clock.restart();
-
+				int currLives = m_player.getLives();
 				// Process events
 				sf::Event event;
 				while (m_window.pollEvent(event)) {
@@ -658,12 +699,14 @@ void GameManager::runGame()
 					int timeLeft = (3 * 60 + m_extraTime) - elapsedTime;
 					if (timeLeft <= 0)
 					{
+						music.stop();
 						endScreen(false);
 					}
 				}
 				
 				if (m_player.getLives() == 0)
 				{
+					music.stop();
 					endScreen(false);
 				}
 
@@ -673,10 +716,18 @@ void GameManager::runGame()
 				for (auto& guard : m_guards) {
 					guard->move(deltaTime, m_board, m_player);
 				}
+				if (m_player.getLives() < currLives)
+				{
+					m_gameOverSound.setBuffer(loadSoundBuffer("dead.ogg"));
+					m_gameOverSound.setVolume(10.f);
+					m_gameOverSound.play();
+				}
 				if (m_currLeveldoor->getPassed())
 				{
 					m_score = 25 + (3 * m_levelNumGuards);
 					m_currLevel++;
+					m_levelUpSound.setBuffer(loadSoundBuffer("levelup.ogg"));
+					m_levelUpSound.play();
 					m_window.close();
 				}
 				
@@ -693,6 +744,7 @@ void GameManager::runGame()
 				m_window.display();
 			}
 		}
+		music.stop();
 		endScreen(true);
 	}
 }

@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 #include <fstream>
 #include <iostream>
 #include <vector>
@@ -18,6 +19,7 @@ public:
 	GameManager();
 	~GameManager();
 	const sf::Texture& loadTexture(const std::string& texturePath);
+	const sf::SoundBuffer& loadSoundBuffer(const std::string& soundBufferPath);
 	void runGame();
 	void drawBoard();
 	void drawLevel(int currLevel);
@@ -40,6 +42,7 @@ private:
 	int m_width = 0, m_height = 0, m_currLevel = 0, m_score = 0, m_levelNumGuards = 0, m_freezeStartTime = -1;
 	const int m_numOfLevels = 3;
 	std::unordered_map<std::string, sf::Texture> m_textures;
+	std::unordered_map<std::string, sf::SoundBuffer> m_sounds;
 	Player m_player;
 	std::vector<Guard*> m_guards;
 	std::vector<PowerUp*> m_powers; 
@@ -50,4 +53,6 @@ private:
 	Door* m_currLeveldoor = nullptr;
 	bool m_inGame = false, m_guardsFrozen = false, m_timeLevel = false;
 	int m_extraTime = 0;
+	sf::Sound m_powerupSound, m_explosionSound, m_levelUpSound, m_gameOverSound;
+	sf::Music m_mainMenuMusic, m_inGameMusic, m_gameOverMusic;
 };
