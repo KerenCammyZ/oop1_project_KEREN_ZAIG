@@ -78,15 +78,7 @@ void GameManager::drawLevel(int level)
 	}
 
 	//reset guards if its a new level
-	if (!m_guards.empty())
-	{
-		for (int i = 0; i < m_guards.size(); i++)
-		{
-			delete m_guards[i];
-			m_guards[i] = nullptr;
-			m_guards.erase(m_guards.begin() + i);
-		}
-	}
+	m_guards.clear();
 
 	//reset time if its a new level
 	m_timeLevel = false;
@@ -114,10 +106,9 @@ void GameManager::drawLevel(int level)
 				m_currLeveldoor = dynamic_cast<Door*>(gameObject);
 				break;
 			case '!':
-				g = new Guard(m_window, sf::Vector2f(col * m_tileSize, m_tileSize + row * m_tileSize));
-				g->setTexture(ResourceManager::instance().getTexture(Texture::guard));
-				g->setType(GUARD);
-				m_guards.push_back(g);
+				m_guards.push_back(std::make_unique<Guard>(m_window, sf::Vector2f(col * m_tileSize, m_tileSize + row * m_tileSize)));
+				m_guards.back()->setTexture(ResourceManager::instance().getTexture(Texture::guard));
+				m_guards.back()->setType(GUARD);
 				break;
 			default:
 				// Track empty spots
@@ -448,10 +439,8 @@ void GameManager::drawGuards()
 
 void GameManager::killGuard(int i)
 {
-	if (!m_guards.empty())
+	if (m_guards.size() > i)
 	{
-		delete m_guards[i];
-		m_guards[i] = nullptr;
 		m_guards.erase(m_guards.begin() + i);
 	}
 	m_score += 5;
@@ -837,9 +826,6 @@ void GameManager::startNewGame() {
 	m_board.clear();
 
 	// Clear guards
-	for (auto& guard : m_guards) {
-		delete guard;
-	}
 	m_guards.clear();
 
 	// Clear power-ups

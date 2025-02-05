@@ -42,7 +42,7 @@ private:
 	int m_width = 0, m_height = 0, m_currLevel = 0, m_score = 0, m_levelNumGuards = 0, m_freezeStartTime = -1;
 	const int m_numOfLevels = 3;
 	Player m_player;
-	std::vector<Guard*> m_guards;
+	std::vector<std::unique_ptr<Guard>> m_guards;
 	std::vector<PowerUp*> m_powers; 
 	sf::Text m_livesText, m_scoreText, m_levelText, m_exitText, m_timeText;
 	sf::Font m_font;
