@@ -226,6 +226,8 @@ void GameManager::mainMenuScreen()
 	m_mainMenuMusic.setLoop(true);
 	m_mainMenuMusic.setVolume(10.f);
 	m_mainMenuMusic.play();
+
+	//sf::Sprite backround
 	
 
 	sf::Font font;
@@ -606,8 +608,10 @@ void GameManager::endScreen(bool flag)
 	int centerX = (menuSize / 2) - text.getGlobalBounds().width / 2;
 	int centerY = (menuSize / 2) - text.getGlobalBounds().height;
 	text.setPosition(sf::Vector2f(centerX, centerY - 20));
-	playAgain.setPosition(sf::Vector2f(centerX, centerY - 100));
+	playAgain.setPosition(sf::Vector2f(centerX + 60, centerY + 210));
 
+	sf::Sprite backround;
+	backround.setTexture(loadTexture("EndScreen.png"));
 
 	while (m_window.isOpen())
 	{
@@ -627,7 +631,7 @@ void GameManager::endScreen(bool flag)
 					if (playAgain.getGlobalBounds().contains(mousePos))
 					{
 						startNewGame();
-						mainMenuScreen();
+//						mainMenuScreen();
 					}
 				}
 				break;
@@ -637,6 +641,7 @@ void GameManager::endScreen(bool flag)
 		}
 
 		m_window.clear(sf::Color::White);
+		m_window.draw(backround);
 		m_window.draw(text);
 		m_window.draw(playAgain);
 		m_window.display();
@@ -732,7 +737,7 @@ void GameManager::runGame()
 		{
 
 			// Load level
-			drawLevel(m_currLevel); //TODO: delete m_guards at the start of each new level
+			drawLevel(m_currLevel);
 			m_window.setFramerateLimit(60);
 			m_player.respawn();
 			
@@ -841,9 +846,12 @@ void GameManager::runGame()
 void GameManager::startNewGame() {
 
 	// Close the existing window
-	if (m_window.isOpen()) {
+	/*if (m_window.isOpen()) {
 		m_window.close();
-	}
+	}*/
+
+	m_window.close();
+
 	// Reset player stats
 	m_player.setLives(3);  // Set default lives
 	m_score = 0;           // Reset score
@@ -875,5 +883,5 @@ void GameManager::startNewGame() {
 	m_clock.restart();
 
 	m_inGame = false;
-	m_currLeveldoor->setPassed(false);
+	//m_currLeveldoor->setPassed(false);
 }
