@@ -594,8 +594,8 @@ void GameManager::endScreen(bool flag)
 					sf::Vector2f mousePos(event.mouseButton.x, event.mouseButton.y);
 					if (playAgain.getGlobalBounds().contains(mousePos))
 					{
+						m_window.close();
 						startNewGame();
-//						mainMenuScreen();
 					}
 				}
 				break;
@@ -659,7 +659,7 @@ void GameManager::helpScreen()
 					{
 						m_inGame = true;
 						m_mainMenuMusic.stop();
-						runGame();
+						startNewGame();
 					}
 				}
 				break;
@@ -676,16 +676,10 @@ void GameManager::helpScreen()
 
 }
 
-void GameManager::runGame() 
+void GameManager::runGame()
 {
-
-	/*if (m_inGame == false)
-	{
-		mainMenuScreen();
-	}
-	else*/
-	startNewGame();
-	{
+	//startNewGame();
+	
 		m_currLevel = 1;
 		sf::Music music;
 		if (!music.openFromFile("inGameMusic.ogg"))
@@ -705,7 +699,7 @@ void GameManager::runGame()
 			drawLevel(m_currLevel);
 			m_window.setFramerateLimit(60);
 			m_player.respawn();
-			
+
 			m_gameBackround.setTexture(ResourceManager::instance().getTexture(Texture::gameBackround));
 
 			//add toolbar
@@ -760,7 +754,7 @@ void GameManager::runGame()
 						endScreen(false);
 					}
 				}
-				
+
 				if (m_player.getLives() == 0)
 				{
 					music.stop();
@@ -779,7 +773,7 @@ void GameManager::runGame()
 					m_gameOverSound.setVolume(10.f);
 					m_gameOverSound.play();
 				}
-				if (m_currLeveldoor != nullptr) 
+				if (m_currLeveldoor != nullptr)
 				{
 					Door* door = static_cast<Door*>(m_currLeveldoor);
 					if (door != nullptr && door->getPassed())
@@ -807,15 +801,13 @@ void GameManager::runGame()
 		}
 		music.stop();
 		endScreen(true);
-	}
+
+	
 }
 
 void GameManager::startNewGame() {
 
-	// Close the existing window
-	/*if (m_window.isOpen()) {
-		m_window.close();
-	}*/
+	
 
 	m_window.close();
 
@@ -842,4 +834,6 @@ void GameManager::startNewGame() {
 
 	m_inGame = false;
 	m_currLeveldoor = nullptr;
+
+	mainMenuScreen();
 }
