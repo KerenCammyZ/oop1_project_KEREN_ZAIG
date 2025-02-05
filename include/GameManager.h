@@ -49,7 +49,8 @@ private:
 	sf::Font m_font;
 	sf::Clock m_clock;
 	std::vector<std::unique_ptr<Bomb>> m_bombs;
-	Door* m_currLeveldoor = nullptr;
+	//Door* m_currLeveldoor = nullptr;
+	GameObject* m_currLeveldoor; // Keep a raw pointer to the door
 	bool m_inGame = false, m_guardsFrozen = false, m_timeLevel = false;
 	int m_extraTime = 0;
 	sf::Sound m_powerupSound, m_explosionSound, m_levelUpSound, m_gameOverSound;

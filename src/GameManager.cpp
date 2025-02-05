@@ -779,15 +779,18 @@ void GameManager::runGame()
 					m_gameOverSound.setVolume(10.f);
 					m_gameOverSound.play();
 				}
-				if (m_currLeveldoor->getPassed())
+				if (m_currLeveldoor != nullptr) 
 				{
-					m_score = 25 + (3 * m_levelNumGuards);
-					m_currLevel++;
-					m_levelUpSound.setBuffer(ResourceManager::instance().getSound(Sound::levelup));
-					m_levelUpSound.play();
-					m_window.close();
+					Door* door = static_cast<Door*>(m_currLeveldoor);
+					if (door != nullptr && door->getPassed())
+					{
+						m_score = 25 + (3 * m_levelNumGuards);
+						m_currLevel++;
+						m_levelUpSound.setBuffer(ResourceManager::instance().getSound(Sound::levelup));
+						m_levelUpSound.play();
+						m_window.close();
+					}
 				}
-				
 				// Render the scene
 				m_window.clear(sf::Color::White);
 				m_window.draw(m_gameBackround);
@@ -838,5 +841,5 @@ void GameManager::startNewGame() {
 	m_clock.restart();
 
 	m_inGame = false;
-	//m_currLeveldoor->setPassed(false);
+	m_currLeveldoor = nullptr;
 }
