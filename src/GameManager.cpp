@@ -331,7 +331,7 @@ void GameManager::drawToolbar()
 	m_window.draw(m_timeText);
 }
 
-void GameManager::drawBombs(std::vector<Bomb*>& m_bombs)
+void GameManager::drawBombs()
 {
 	if (m_bombs.empty())
 		return;
@@ -369,8 +369,6 @@ void GameManager::drawBombs(std::vector<Bomb*>& m_bombs)
 				{
 					m_player.lostLife();
 				}
-				delete m_bombs[i];
-				m_bombs[i] = nullptr; // Avoid dangling pointer
 				m_bombs.erase(m_bombs.begin() + i);
 				--i; // Adjust index after erasing
 				continue;
@@ -741,8 +739,7 @@ void GameManager::runGame()
 					case sf::Event::KeyPressed:
 						if (event.key.code == sf::Keyboard::B)
 						{
-							Bomb* b = new Bomb(m_window, m_player.getSprite().getPosition().x, m_player.getSprite().getPosition().y);
-							m_bombs.push_back(b);
+							m_bombs.push_back(std::make_unique<Bomb>(m_window, m_player.getSprite().getPosition().x, m_player.getSprite().getPosition().y));
 						}
 						else
 							m_player.setDirection(event.key.code);
@@ -802,7 +799,7 @@ void GameManager::runGame()
 				drawBoard();
 				m_player.draw();
 				if (!m_bombs.empty())
-					drawBombs(m_bombs);
+					drawBombs();
 				if (!m_powers.empty())
 					drawPowerUps(m_powers);
 				drawGuards();

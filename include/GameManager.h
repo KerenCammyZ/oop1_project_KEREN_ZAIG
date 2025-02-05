@@ -5,6 +5,7 @@
 #include <fstream>
 #include <iostream>
 #include <vector>
+#include <memory>
 #include "GameObject.h"
 #include "Player.h"
 #include <unordered_map>
@@ -25,7 +26,7 @@ public:
 	void mainMenuScreen();
 	void toolbar();
 	void drawToolbar();
-	void drawBombs(std::vector<Bomb*> &m_bombs);
+	void drawBombs();
 	void explodeBomb(float x, float y);
 	void drawGuards();
 	void killGuard(int i);
@@ -46,7 +47,7 @@ private:
 	sf::Text m_livesText, m_scoreText, m_levelText, m_exitText, m_timeText;
 	sf::Font m_font;
 	sf::Clock m_clock;
-	std::vector<Bomb*> m_bombs;
+	std::vector<std::unique_ptr<Bomb>> m_bombs;
 	Door* m_currLeveldoor = nullptr;
 	bool m_inGame = false, m_guardsFrozen = false, m_timeLevel = false;
 	int m_extraTime = 0;
