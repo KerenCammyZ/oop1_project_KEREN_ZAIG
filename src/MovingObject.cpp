@@ -1,6 +1,7 @@
 #include "MovingObject.h"
 #include "Player.h"
 #include "Door.h"
+#include <memory>
 using std::round;
 
 MovingObject::MovingObject(sf::RenderWindow& window, sf::Vector2f position) : GameObject(position.x, position.y, UNKNOWN, window){}
@@ -16,7 +17,7 @@ void MovingObject::moveSprite(const sf::Vector2f& offset)
 	m_sprite.move(offset);
 }
 
-void MovingObject::move(sf::Time deltaTime, std::vector<std::vector<GameObject*>>& m_board, Player &player)
+void MovingObject::move(sf::Time deltaTime, std::vector<std::vector<std::unique_ptr<GameObject>>> &m_board, Player &player)
 {
     const auto speedPerSecond = static_cast<float>(m_tileSize * 1.5); //one and a half tiles per second
 
@@ -60,7 +61,7 @@ void MovingObject::move(sf::Time deltaTime, std::vector<std::vector<GameObject*>
                     }
                     else if (obj->getType() == DOOR) {
                         // If the object is a Door, set its m_passed attribute to true
-                        Door* door = dynamic_cast<Door*>(obj);
+                        Door* door = dynamic_cast<Door*>(obj.get());
                         if (door) {
                             door->setPassed(true);
                         }

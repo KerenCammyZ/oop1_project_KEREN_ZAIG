@@ -37,7 +37,8 @@ public:
 	void endScreen(bool flag);
 	void helpScreen();
 private:
-	std::vector<std::vector<GameObject*>> m_board;
+	//std::vector<std::vector<GameObject*>> m_board;
+	std::vector<std::vector<std::unique_ptr<GameObject>>> m_board;
 	sf::RenderWindow m_window;
 	int m_width = 0, m_height = 0, m_currLevel = 0, m_score = 0, m_levelNumGuards = 0, m_freezeStartTime = -1;
 	const int m_numOfLevels = 3;
