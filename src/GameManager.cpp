@@ -1,4 +1,5 @@
 #include "GameManager.h"
+#include "ResourceManager.h"
 #include "GameObject.h"
 #include "Guard.h"
 #include "Wall.h"
@@ -15,7 +16,7 @@ GameManager::GameManager() : m_player(m_window, sf::Vector2f(m_tileSize, m_tileS
 		std::cerr << "Error: Cannot load font 'Orange Kid.otf'\n";
 	}
 
-	m_player.setTexture(loadTexture("player.png"));
+	m_player.setTexture(ResourceManager::instance().getTexture(Texture::player));
 	m_player.setPosition(sf::Vector2f(m_tileSize, m_tileSize));
 }
 
@@ -29,33 +30,6 @@ GameManager::~GameManager() {
 	m_board.clear();
 }
 
-const sf::Texture& GameManager::loadTexture(const std::string& texturePath) {
-	// Check if the texture is already loaded
-	if (m_textures.find(texturePath) == m_textures.end()) {
-		// Load the texture and store it
-		sf::Texture texture;
-		if (!texture.loadFromFile(texturePath)) {
-			std::cerr << "Error loading texture: " << texturePath << "\n";
-		}
-		m_textures[texturePath] = std::move(texture);
-	}
-	return m_textures[texturePath];
-}
-
-const sf::SoundBuffer& GameManager::loadSoundBuffer(const std::string& soundBufferPath)
-{
-	//simaler checks to loadTexture but with sound buffer
-	if (m_sounds.find(soundBufferPath) == m_sounds.end())
-	{
-		sf::SoundBuffer sound;
-		if (!sound.loadFromFile(soundBufferPath))
-		{
-			std::cerr << "Error loading sound buffer: " << soundBufferPath << "\n";
-		}
-		m_sounds[soundBufferPath] = std::move(sound);
-	}
-	return m_sounds[soundBufferPath];
-}
 
 void GameManager::drawBoard()
 {
@@ -128,20 +102,20 @@ void GameManager::drawLevel(int level)
 			switch (tile) {
 			case '#':
 				gameObject = new Wall(col * m_tileSize, m_tileSize + row * m_tileSize, m_window);
-				gameObject->setTexture(loadTexture("wall.png"));
+				gameObject->setTexture(ResourceManager::instance().getTexture(Texture::wall));
 				break;
 			case '@':
 				gameObject = new Rock(col * m_tileSize, m_tileSize + row * m_tileSize, m_window);
-				gameObject->setTexture(loadTexture("rock.png"));
+				gameObject->setTexture(ResourceManager::instance().getTexture(Texture::rock));
 				break;
 			case 'D':
 				gameObject = new Door(col * m_tileSize, m_tileSize + row * m_tileSize, m_window);
-				gameObject->setTexture(loadTexture("door.png"));
+				gameObject->setTexture(ResourceManager::instance().getTexture(Texture::door));
 				m_currLeveldoor = dynamic_cast<Door*>(gameObject);
 				break;
 			case '!':
 				g = new Guard(m_window, sf::Vector2f(col * m_tileSize, m_tileSize + row * m_tileSize));
-				g->setTexture(loadTexture("guard.png"));
+				g->setTexture(ResourceManager::instance().getTexture(Texture::guard));
 				g->setType(GUARD);
 				m_guards.push_back(g);
 				break;
@@ -185,20 +159,20 @@ void GameManager::drawLevel(int level)
 			{
 			case 0:
 				powerUp = new PowerUp(x, y, DISSAPEAR, m_window);
-				powerUp->setTexture(loadTexture("dissapear.png"));
+				powerUp->setTexture(ResourceManager::instance().getTexture(Texture::dissapear));
 				break;
 			case 1:
 				powerUp = new PowerUp(x, y, TIME, m_window);
-				powerUp->setTexture(loadTexture("time.png"));
+				powerUp->setTexture(ResourceManager::instance().getTexture(Texture::time));
 				m_timeLevel = true; //make it a time level if this powerup appears
 				break;
 			case 2:
 				powerUp = new PowerUp(x, y, FREEZE, m_window);
-				powerUp->setTexture(loadTexture("freeze.png"));
+				powerUp->setTexture(ResourceManager::instance().getTexture(Texture::freeze));
 				break;
 			case 3:
 				powerUp = new PowerUp(x, y, LIFE, m_window);
-				powerUp->setTexture(loadTexture("life.png"));
+				powerUp->setTexture(ResourceManager::instance().getTexture(Texture::life));
 				break;
 			default:
 				break;
@@ -369,22 +343,20 @@ void GameManager::drawBombs(std::vector<Bomb*>& m_bombs)
 			switch (currTime)
 			{
 			case 0:
-				m_bombs[i]->setTexture(loadTexture("bomb1.png"));
-				break;
 			case 1:
-				m_bombs[i]->setTexture(loadTexture("bomb1.png"));
+				m_bombs[i]->setTexture(ResourceManager::instance().getTexture(Texture::bomb1));
 				break;
 			case 2:
-				m_bombs[i]->setTexture(loadTexture("bomb2.png"));
+				m_bombs[i]->setTexture(ResourceManager::instance().getTexture(Texture::bomb2));
 				break;
 			case 3:
-				m_bombs[i]->setTexture(loadTexture("bomb3.png"));
+				m_bombs[i]->setTexture(ResourceManager::instance().getTexture(Texture::bomb3));
 				break;
 			case 4:
-				m_bombs[i]->setTexture(loadTexture("bomb4.png"));
+				m_bombs[i]->setTexture(ResourceManager::instance().getTexture(Texture::bomb4));
 				break;
 			case 5:
-				m_bombs[i]->setTexture(loadTexture("explosion.png"));
+				m_bombs[i]->setTexture(ResourceManager::instance().getTexture(Texture::explosion));
 				
 				break;
 			default:
@@ -412,7 +384,7 @@ void GameManager::drawBombs(std::vector<Bomb*>& m_bombs)
 
 void GameManager::explodeBomb(float x, float y)
 {
-	m_explosionSound.setBuffer(loadSoundBuffer("explosion.ogg"));
+	m_explosionSound.setBuffer(ResourceManager::instance().getSound(Sound::explosion));
 	m_explosionSound.setVolume(10.f);
 	m_explosionSound.play();
 	std::vector<std::pair<int, int>> explosionArea = {
@@ -537,7 +509,7 @@ void GameManager::activatePowerUps()
 					break;
 
 				}
-				m_powerupSound.setBuffer(loadSoundBuffer("powerup.ogg"));
+				m_powerupSound.setBuffer(ResourceManager::instance().getSound(Sound::powerup));
 				m_powerupSound.play();
 			}
 			
@@ -611,7 +583,7 @@ void GameManager::endScreen(bool flag)
 	playAgain.setPosition(sf::Vector2f(centerX + 60, centerY + 210));
 
 	sf::Sprite backround;
-	backround.setTexture(loadTexture("EndScreen.png"));
+	backround.setTexture(ResourceManager::instance().getTexture(Texture::EndScreen));
 
 	while (m_window.isOpen())
 	{
@@ -741,7 +713,7 @@ void GameManager::runGame()
 			m_window.setFramerateLimit(60);
 			m_player.respawn();
 			
-			m_gameBackround.setTexture(loadTexture("gameBackround.png"));
+			m_gameBackround.setTexture(ResourceManager::instance().getTexture(Texture::gameBackround));
 
 			//add toolbar
 			toolbar();
@@ -811,7 +783,7 @@ void GameManager::runGame()
 				}
 				if (m_player.getLives() < currLives)
 				{
-					m_gameOverSound.setBuffer(loadSoundBuffer("dead.ogg"));
+					m_gameOverSound.setBuffer(ResourceManager::instance().getSound(Sound::dead));
 					m_gameOverSound.setVolume(10.f);
 					m_gameOverSound.play();
 				}
@@ -819,7 +791,7 @@ void GameManager::runGame()
 				{
 					m_score = 25 + (3 * m_levelNumGuards);
 					m_currLevel++;
-					m_levelUpSound.setBuffer(loadSoundBuffer("levelup.ogg"));
+					m_levelUpSound.setBuffer(ResourceManager::instance().getSound(Sound::levelup));
 					m_levelUpSound.play();
 					m_window.close();
 				}

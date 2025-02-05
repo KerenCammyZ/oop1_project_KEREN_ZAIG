@@ -18,8 +18,6 @@ class GameManager {
 public:
 	GameManager();
 	~GameManager();
-	const sf::Texture& loadTexture(const std::string& texturePath);
-	const sf::SoundBuffer& loadSoundBuffer(const std::string& soundBufferPath);
 	void runGame();
 	void startNewGame();
 	void drawBoard();
@@ -42,8 +40,6 @@ private:
 	sf::RenderWindow m_window;
 	int m_width = 0, m_height = 0, m_currLevel = 0, m_score = 0, m_levelNumGuards = 0, m_freezeStartTime = -1;
 	const int m_numOfLevels = 3;
-	std::unordered_map<std::string, sf::Texture> m_textures;
-	std::unordered_map<std::string, sf::SoundBuffer> m_sounds;
 	Player m_player;
 	std::vector<Guard*> m_guards;
 	std::vector<PowerUp*> m_powers; 
