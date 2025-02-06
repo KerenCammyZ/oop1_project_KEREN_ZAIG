@@ -63,6 +63,9 @@ void GameManager::drawLevel(int level)
 	// Set window size based on level
 	int windowWidth = numCols * m_tileSize;
 	int windowHeight = (numRows * m_tileSize);
+	if (m_window.isOpen()) {
+		m_window.close();
+	}
 	m_window.create(sf::VideoMode(windowWidth, windowHeight + m_tileSize), "Bomberman");
 	m_width = windowWidth;
 	m_height = windowHeight + m_tileSize;
@@ -187,6 +190,9 @@ void GameManager::drawLevel(int level)
 void GameManager::mainMenuScreen()
 {
 	int menuSize = 1000;
+	if (m_window.isOpen()) {
+		m_window.close();
+	}
 	m_window.create(sf::VideoMode(menuSize, menuSize), "Bomberman Main Menu");
 	if (!m_mainMenuMusic.openFromFile("mainMenuMusic.ogg"))
 	{
@@ -239,10 +245,12 @@ void GameManager::mainMenuScreen()
 					{
 						m_inGame = true;
 						m_mainMenuMusic.stop();
+						m_window.close();
 						runGame();
 					}
 					if (help.getGlobalBounds().contains(mousePos))
 					{
+						m_window.close();
 						helpScreen();
 					}
 				}
@@ -548,6 +556,9 @@ void GameManager::endScreen(bool flag)
 {
 
 	int menuSize = 1000;
+	if (m_window.isOpen()) {
+		m_window.close();
+	}
 	m_window.create(sf::VideoMode(menuSize, menuSize), "Bomberman");
 	sf::Font font;
 	if (!font.loadFromFile("Orange Kid.otf"))
@@ -610,6 +621,7 @@ void GameManager::endScreen(bool flag)
 		m_window.draw(playAgain);
 		m_window.display();
 	}
+
 }
 
 void GameManager::helpScreen()
@@ -679,11 +691,11 @@ void GameManager::helpScreen()
 void GameManager::runGame()
 {
 
-	if (m_inGame == false)
-	{
-		mainMenuScreen();
-	}
-	else
+	//if (m_inGame == false)
+	//{
+	//	mainMenuScreen();
+	//}
+	//else
 	{
 		m_currLevel = 1;
 		sf::Music music;
@@ -805,16 +817,18 @@ void GameManager::runGame()
 			}
 		}
 		music.stop();
+		m_window.close();
 		endScreen(true);
 
-	
+
+	}
 }
 
 void GameManager::startNewGame() {
-
-	
-
-	m_window.close();
+	if (m_window.isOpen())
+	{
+		m_window.close();
+	}
 
 	// Reset player stats
 	m_player.setLives(3);  // Set default lives
