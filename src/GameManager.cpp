@@ -103,7 +103,7 @@ void GameManager::drawLevel(int level)
 			case 'D':
 				gameObject = new Door(col * m_tileSize, m_tileSize + row * m_tileSize, m_window);
 				gameObject->setTexture(ResourceManager::instance().getTexture(Texture::door));
-				m_currLeveldoor = dynamic_cast<Door*>(gameObject);
+				m_currLeveldoor = std::make_shared<Door>(col * m_tileSize, m_tileSize + row * m_tileSize, m_window);
 				break;
 			case '!':
 				m_guards.push_back(std::make_unique<Guard>(m_window, sf::Vector2f(col * m_tileSize, m_tileSize + row * m_tileSize)));
@@ -590,7 +590,6 @@ void GameManager::endScreen(bool flag)
 					if (playAgain.getGlobalBounds().contains(mousePos))
 					{
 						startNewGame();
-//						mainMenuScreen();
 					}
 				}
 				break;
@@ -673,7 +672,6 @@ void GameManager::helpScreen()
 
 void GameManager::runGame() 
 {
-
 	if (m_inGame == false)
 	{
 		mainMenuScreen();

@@ -48,7 +48,7 @@ private:
 	sf::Font m_font;
 	sf::Clock m_clock;
 	std::vector<std::unique_ptr<Bomb>> m_bombs;
-	Door* m_currLeveldoor = nullptr;
+	std::shared_ptr<Door> m_currLeveldoor;
 	bool m_inGame = false, m_guardsFrozen = false, m_timeLevel = false;
 	int m_extraTime = 0;
 	sf::Sound m_powerupSound, m_explosionSound, m_levelUpSound, m_gameOverSound;
