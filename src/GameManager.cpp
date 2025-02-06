@@ -7,6 +7,7 @@
 #include "Door.h"
 #include "Bomb.h"
 #include <random>
+#include <memory>
 
 GameManager::GameManager() : m_player(m_window, sf::Vector2f(m_tileSize, m_tileSize)) {
 	m_width = 0;
@@ -21,12 +22,6 @@ GameManager::GameManager() : m_player(m_window, sf::Vector2f(m_tileSize, m_tileS
 }
 
 GameManager::~GameManager() {
-	for (auto& row : m_board) {
-		for (auto& obj : row) {
-			delete obj;
-			obj = nullptr; // Avoid dangling pointers
-		}
-	}
 	m_board.clear();
 }
 
@@ -74,7 +69,7 @@ void GameManager::drawLevel(int level)
 
 	m_board.resize(numRows);
 	for (auto& row : m_board) {
-		row.resize(numCols, nullptr);
+		row.resize(numCols);  
 	}
 
 	//reset guards if its a new level
@@ -84,26 +79,29 @@ void GameManager::drawLevel(int level)
 	m_timeLevel = false;
 
 	std::vector<std::pair<int, int>> emptyTiles; // Store empty tile positions
+	std::unique_ptr<Door> door = nullptr;
 
 	for (int row = 0; row < numRows; ++row) {
 		for (int col = 0; col < numCols; ++col) {
 			char tile = lines[row][col];
-			GameObject* gameObject = nullptr;
+			//GameObject* gameObject = nullptr;
+			std::unique_ptr<GameObject> gameObject = nullptr;
 			Guard* g = nullptr;
 
 			switch (tile) {
 			case '#':
-				gameObject = new Wall(col * m_tileSize, m_tileSize + row * m_tileSize, m_window);
+				gameObject = std::make_unique<Wall>(col * m_tileSize, m_tileSize + row * m_tileSize, m_window);
 				gameObject->setTexture(ResourceManager::instance().getTexture(Texture::wall));
 				break;
 			case '@':
-				gameObject = new Rock(col * m_tileSize, m_tileSize + row * m_tileSize, m_window);
+				gameObject = std::make_unique<Rock>(col * m_tileSize, m_tileSize + row * m_tileSize, m_window);
 				gameObject->setTexture(ResourceManager::instance().getTexture(Texture::rock));
 				break;
 			case 'D':
-				gameObject = new Door(col * m_tileSize, m_tileSize + row * m_tileSize, m_window);
-				gameObject->setTexture(ResourceManager::instance().getTexture(Texture::door));
-				m_currLeveldoor = std::make_shared<Door>(col * m_tileSize, m_tileSize + row * m_tileSize, m_window);
+				door = std::make_unique<Door>(col * m_tileSize, m_tileSize + row * m_tileSize, m_window);
+				door->setTexture(ResourceManager::instance().getTexture(Texture::door));
+				//m_board[row][col] = std::move(door);
+				break;
 				break;
 			case '!':
 				m_guards.push_back(std::make_unique<Guard>(m_window, sf::Vector2f(col * m_tileSize, m_tileSize + row * m_tileSize)));
@@ -116,11 +114,18 @@ void GameManager::drawLevel(int level)
 				break;
 			}
 
-			m_board[row][col] = gameObject;
+			m_board[row][col] = std::move(gameObject);
 			if (gameObject && !gameObject->getSprite().getTexture()) {
 				std::cerr << "Error: object texture not set properly.\n";
 			}
 		}
+	}
+	// If a door was created, store it in the board and update m_currLeveldoor
+	if (door) {
+		int doorRow = door->getSprite().getPosition().y / m_tileSize;
+		int doorCol = door->getSprite().getPosition().x / m_tileSize;
+		m_currLeveldoor = door.get();  // Store raw pointer to the Door
+		m_board[doorRow][doorCol] = std::move(door);
 	}
 
 	if (!m_guards.empty())
@@ -391,15 +396,15 @@ void GameManager::explodeBomb(float x, float y)
 		if (ex < 0 || ey < 0 || ey >= maxRows || ex >= maxCols)
 			continue;
 
-		GameObject* obj = m_board[ey][ex];
+		//GameObject* obj = m_board[ey][ex];
+		std::unique_ptr<GameObject>& obj = m_board[ey][ex];  
 
 		if (!obj) continue;
 
 		switch (obj->getType())
 		{
 		case ROCK:
-			delete obj;
-			m_board[ey][ex] = nullptr;
+			obj.reset();
 			break;
 
 		default:
@@ -589,6 +594,7 @@ void GameManager::endScreen(bool flag)
 					sf::Vector2f mousePos(event.mouseButton.x, event.mouseButton.y);
 					if (playAgain.getGlobalBounds().contains(mousePos))
 					{
+						m_window.close();
 						startNewGame();
 					}
 				}
@@ -653,7 +659,7 @@ void GameManager::helpScreen()
 					{
 						m_inGame = true;
 						m_mainMenuMusic.stop();
-						runGame();
+						startNewGame();
 					}
 				}
 				break;
@@ -670,8 +676,9 @@ void GameManager::helpScreen()
 
 }
 
-void GameManager::runGame() 
+void GameManager::runGame()
 {
+
 	if (m_inGame == false)
 	{
 		mainMenuScreen();
@@ -697,7 +704,7 @@ void GameManager::runGame()
 			drawLevel(m_currLevel);
 			m_window.setFramerateLimit(60);
 			m_player.respawn();
-			
+
 			m_gameBackround.setTexture(ResourceManager::instance().getTexture(Texture::gameBackround));
 
 			//add toolbar
@@ -752,7 +759,7 @@ void GameManager::runGame()
 						endScreen(false);
 					}
 				}
-				
+
 				if (m_player.getLives() == 0)
 				{
 					music.stop();
@@ -771,15 +778,18 @@ void GameManager::runGame()
 					m_gameOverSound.setVolume(10.f);
 					m_gameOverSound.play();
 				}
-				if (m_currLeveldoor->getPassed())
+				if (m_currLeveldoor != nullptr)
 				{
-					m_score = 25 + (3 * m_levelNumGuards);
-					m_currLevel++;
-					m_levelUpSound.setBuffer(ResourceManager::instance().getSound(Sound::levelup));
-					m_levelUpSound.play();
-					m_window.close();
+					Door* door = static_cast<Door*>(m_currLeveldoor);
+					if (door != nullptr && door->getPassed())
+					{
+						m_score = 25 + (3 * m_levelNumGuards);
+						m_currLevel++;
+						m_levelUpSound.setBuffer(ResourceManager::instance().getSound(Sound::levelup));
+						m_levelUpSound.play();
+						m_window.close();
+					}
 				}
-				
 				// Render the scene
 				m_window.clear(sf::Color::White);
 				m_window.draw(m_gameBackround);
@@ -796,15 +806,13 @@ void GameManager::runGame()
 		}
 		music.stop();
 		endScreen(true);
-	}
+
+	
 }
 
 void GameManager::startNewGame() {
 
-	// Close the existing window
-	/*if (m_window.isOpen()) {
-		m_window.close();
-	}*/
+	
 
 	m_window.close();
 
@@ -815,12 +823,6 @@ void GameManager::startNewGame() {
 	m_timeLevel = false;
 
 	// Clear existing game objects
-	for (auto& row : m_board) {
-		for (auto& obj : row) {
-			delete obj;
-			obj = nullptr;
-		}
-	}
 	m_board.clear();
 
 	// Clear guards
@@ -836,5 +838,7 @@ void GameManager::startNewGame() {
 	m_clock.restart();
 
 	m_inGame = false;
-	//m_currLeveldoor->setPassed(false);
+	m_currLeveldoor = nullptr;
+
+	mainMenuScreen();
 }

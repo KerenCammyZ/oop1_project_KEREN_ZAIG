@@ -1,5 +1,6 @@
 #include <cstdlib>
 #include <ctime>
+#include <memory>
 #include "Guard.h"
 #include "Player.h"
 
@@ -61,7 +62,7 @@ void Guard::setFrozen(bool freeze)
     m_frozen = freeze;
 }
 
-void Guard::move(sf::Time deltaTime, std::vector<std::vector<GameObject*>>& m_board, Player &player)
+void Guard::move(sf::Time deltaTime, std::vector<std::vector<std::unique_ptr<GameObject>>> &m_board, Player &player)
 {
     //dont move if frozen
     if (m_frozen)

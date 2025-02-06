@@ -37,7 +37,8 @@ public:
 	void endScreen(bool flag);
 	void helpScreen();
 private:
-	std::vector<std::vector<GameObject*>> m_board;
+	//std::vector<std::vector<GameObject*>> m_board;
+	std::vector<std::vector<std::unique_ptr<GameObject>>> m_board;
 	sf::RenderWindow m_window;
 	int m_width = 0, m_height = 0, m_currLevel = 0, m_score = 0, m_levelNumGuards = 0, m_freezeStartTime = -1;
 	const int m_numOfLevels = 3;
@@ -48,7 +49,8 @@ private:
 	sf::Font m_font;
 	sf::Clock m_clock;
 	std::vector<std::unique_ptr<Bomb>> m_bombs;
-	std::shared_ptr<Door> m_currLeveldoor;
+	//Door* m_currLeveldoor = nullptr;
+	GameObject* m_currLeveldoor; // Keep a raw pointer to the door
 	bool m_inGame = false, m_guardsFrozen = false, m_timeLevel = false;
 	int m_extraTime = 0;
 	sf::Sound m_powerupSound, m_explosionSound, m_levelUpSound, m_gameOverSound;
