@@ -9,6 +9,32 @@
 #include <random>
 #include <memory>
 
+void GameManager::run()
+{
+	GameState state = GameState::MAIN_MENU;  // Start with the main menu
+	bool running = true;
+
+	while (running)
+	{
+		switch (state)
+		{
+		case GameState::MAIN_MENU:
+			state = mainMenuScreen();  // Returns the next state
+			break;
+		case GameState::IN_GAME:
+			state = runGame();         // Returns the next state
+			break;
+		case GameState::HELP_SCREEN:
+			state = helpScreen();      // Returns the next state
+			break;
+		case GameState::END_SCREEN:
+			state = endScreen(m_won);       // Returns the next state
+			break;
+		}
+	}
+}
+
+
 GameManager::GameManager() : m_player(m_window, sf::Vector2f(m_tileSize, m_tileSize)) {
 	m_width = 0;
 	m_height = 0;
@@ -187,12 +213,12 @@ void GameManager::drawLevel(int level)
 	}
 }
 
-void GameManager::mainMenuScreen()
+GameManager::GameState GameManager::mainMenuScreen()
 {
 	int menuSize = 1000;
-	if (m_window.isOpen()) {
+	/*if (m_window.isOpen()) {
 		m_window.close();
-	}
+	}*/
 	m_window.create(sf::VideoMode(menuSize, menuSize), "Bomberman Main Menu");
 	if (!m_mainMenuMusic.openFromFile("mainMenuMusic.ogg"))
 	{
@@ -236,6 +262,7 @@ void GameManager::mainMenuScreen()
 			{
 			case sf::Event::Closed:
 				m_window.close();
+				exit(EXIT_SUCCESS);
 				break;
 			case sf::Event::MouseButtonPressed:
 				if (event.mouseButton.button == sf::Mouse::Left)
@@ -246,12 +273,13 @@ void GameManager::mainMenuScreen()
 						m_inGame = true;
 						m_mainMenuMusic.stop();
 						m_window.close();
-						runGame();
+						return GameState::IN_GAME;
 					}
 					if (help.getGlobalBounds().contains(mousePos))
 					{
 						m_window.close();
-						helpScreen();
+						return GameState::HELP_SCREEN;
+						/*helpScreen();*/
 					}
 				}
 				break;
@@ -265,6 +293,7 @@ void GameManager::mainMenuScreen()
 		m_window.draw(help);
 		m_window.display();
 	}
+	return GameState::MAIN_MENU;
 }
 
 void GameManager::toolbar()
@@ -552,13 +581,13 @@ void GameManager::drawPowerUps(const std::vector<PowerUp*>& m_powers)
 	}
 }
 
-void GameManager::endScreen(bool flag)
+GameManager::GameState GameManager::endScreen(bool flag)
 {
 
 	int menuSize = 1000;
-	if (m_window.isOpen()) {
+	/*if (m_window.isOpen()) {
 		m_window.close();
-	}
+	}*/
 	m_window.create(sf::VideoMode(menuSize, menuSize), "Bomberman");
 	sf::Font font;
 	if (!font.loadFromFile("Orange Kid.otf"))
@@ -597,6 +626,7 @@ void GameManager::endScreen(bool flag)
 			{
 			case sf::Event::Closed:
 				m_window.close();
+				//return GameState::MAIN_MENU;
 				exit(EXIT_SUCCESS);
 				break;
 			case sf::Event::MouseButtonPressed:
@@ -606,7 +636,7 @@ void GameManager::endScreen(bool flag)
 					if (playAgain.getGlobalBounds().contains(mousePos))
 					{
 						m_window.close();
-						startNewGame();
+						return GameState::MAIN_MENU;
 					}
 				}
 				break;
@@ -621,10 +651,10 @@ void GameManager::endScreen(bool flag)
 		m_window.draw(playAgain);
 		m_window.display();
 	}
-
+	return GameState::MAIN_MENU;
 }
 
-void GameManager::helpScreen()
+GameManager::GameState GameManager::helpScreen()
 {
 	int menuSize = 1000;
 	m_window.create(sf::VideoMode(menuSize, menuSize), "How to Play");
@@ -661,7 +691,7 @@ void GameManager::helpScreen()
 			{
 			case sf::Event::Closed:
 				m_window.close();
-				exit(EXIT_SUCCESS);
+				return GameState::MAIN_MENU;
 				break;
 			case sf::Event::MouseButtonPressed:
 				if (event.mouseButton.button == sf::Mouse::Left)
@@ -671,7 +701,7 @@ void GameManager::helpScreen()
 					{
 						m_inGame = true;
 						m_mainMenuMusic.stop();
-						startNewGame();
+						return GameState::MAIN_MENU;
 					}
 				}
 				break;
@@ -685,18 +715,13 @@ void GameManager::helpScreen()
 		m_window.draw(PLAY);
 		m_window.display();
 	}
+	return GameState::MAIN_MENU;
 
 }
 
-void GameManager::runGame()
+GameManager::GameState GameManager::runGame()
 {
-
-	//if (m_inGame == false)
-	//{
-	//	mainMenuScreen();
-	//}
-	//else
-	{
+	startNewGame();
 		m_currLevel = 1;
 		sf::Music music;
 		if (!music.openFromFile("inGameMusic.ogg"))
@@ -739,7 +764,7 @@ void GameManager::runGame()
 					switch (event.type) {
 					case sf::Event::Closed:
 						m_window.close();
-						return; // exit game
+						return GameState::MAIN_MENU;
 						break;
 
 					case sf::Event::KeyPressed:
@@ -768,14 +793,18 @@ void GameManager::runGame()
 					if (timeLeft <= 0)
 					{
 						music.stop();
-						endScreen(false);
+						m_won = false;
+						m_window.close();
+						return GameState::END_SCREEN;
 					}
 				}
 
 				if (m_player.getLives() == 0)
 				{
+					m_won = false;
 					music.stop();
-					endScreen(false);
+					m_window.close();
+					return GameState::END_SCREEN;
 				}
 
 				//no game over, do normal events
@@ -816,12 +845,10 @@ void GameManager::runGame()
 				m_window.display();
 			}
 		}
+		m_won = true;
 		music.stop();
 		m_window.close();
-		endScreen(true);
-
-
-	}
+		return GameState::END_SCREEN;
 }
 
 void GameManager::startNewGame() {
@@ -835,6 +862,7 @@ void GameManager::startNewGame() {
 	m_score = 0;           // Reset score
 	m_currLevel = 1;       // Start at level 1
 	m_timeLevel = false;
+	m_won = false;
 
 	// Clear existing game objects
 	m_board.clear();
@@ -854,5 +882,5 @@ void GameManager::startNewGame() {
 	m_inGame = false;
 	m_currLeveldoor = nullptr;
 
-	mainMenuScreen();
+	//mainMenuScreen();
 }

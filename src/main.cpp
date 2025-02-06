@@ -2,5 +2,5 @@
 int main()
 {
 	GameManager Bomberman;
-	Bomberman.startNewGame();
+	Bomberman.run();
 }

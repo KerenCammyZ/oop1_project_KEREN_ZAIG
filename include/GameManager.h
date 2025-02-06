@@ -17,13 +17,15 @@
 
 class GameManager {
 public:
+	enum class GameState { MAIN_MENU, IN_GAME, HELP_SCREEN, END_SCREEN };
+	void run();
 	GameManager();
 	~GameManager();
-	void runGame();
+	GameState runGame();
 	void startNewGame();
 	void drawBoard();
 	void drawLevel(int currLevel);
-	void mainMenuScreen();
+	GameState mainMenuScreen();
 	void toolbar();
 	void drawToolbar();
 	void drawBombs();
@@ -34,8 +36,8 @@ public:
 	void setGuardsFrozen(bool freeze);
 	void deletePowerUp(int i);
 	void drawPowerUps(const std::vector<PowerUp*>& m_powers);
-	void endScreen(bool flag);
-	void helpScreen();
+	GameState endScreen(bool flag);
+	GameState helpScreen();
 private:
 	//std::vector<std::vector<GameObject*>> m_board;
 	std::vector<std::vector<std::unique_ptr<GameObject>>> m_board;
@@ -51,7 +53,7 @@ private:
 	std::vector<std::unique_ptr<Bomb>> m_bombs;
 	//Door* m_currLeveldoor = nullptr;
 	GameObject* m_currLeveldoor; // Keep a raw pointer to the door
-	bool m_inGame = false, m_guardsFrozen = false, m_timeLevel = false;
+	bool m_inGame = false, m_guardsFrozen = false, m_timeLevel = false, m_won = false;
 	int m_extraTime = 0;
 	sf::Sound m_powerupSound, m_explosionSound, m_levelUpSound, m_gameOverSound;
 	sf::Music m_mainMenuMusic;
