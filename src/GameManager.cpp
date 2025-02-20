@@ -19,16 +19,16 @@ void GameManager::run()
 		switch (state)
 		{
 		case GameState::MAIN_MENU:
-			state = mainMenuScreen();  // Returns the next state
+			state = mainMenuScreen();  
 			break;
 		case GameState::IN_GAME:
-			state = runGame();         // Returns the next state
+			state = runGame();        
 			break;
 		case GameState::HELP_SCREEN:
-			state = helpScreen();      // Returns the next state
+			state = helpScreen();      
 			break;
 		case GameState::END_SCREEN:
-			state = endScreen(m_won);       // Returns the next state
+			state = endScreen(m_won);       
 			break;
 		}
 	}
