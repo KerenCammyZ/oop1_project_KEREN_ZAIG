@@ -1,6 +1,6 @@
 OOP1 Final Project Bomberman Game
 
-Student: Keren Zaig 329878656
+Student: Keren Zaig 
 
 =======================ABOUT=======================
 This project is a recreation of the retro game BOMBERMAN for the NES.
