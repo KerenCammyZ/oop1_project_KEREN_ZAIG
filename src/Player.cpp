@@ -1,29 +1,31 @@
 #include "Player.h"
 
-Player::Player()
-{
-	if (!(m_playerTexture.loadFromFile("player.png") && m_wallTexture.loadFromFile("wall.png")
-		&& m_doorTexture.loadFromFile("door.png") && m_rockTexture.loadFromFile("rock.png")))
-	{
-		std::cerr << "Failed to load one or more textures.\n";
-		return;
-	}
-	m_playerSprite.setTexture(m_playerTexture);
-	m_playerSprite.setPosition(m_tileSize, m_tileSize + m_toolbarHeight);
+Player::Player(sf::RenderWindow& window, sf::Vector2f position)
+    : MovingObject(window, position), m_lives(3) {
+    setPosition(position);    // Set initial position
+    m_type = PLAYER;
 }
 
-void Player::drawPlayer(sf::RenderWindow& window)
-{
-	window.draw(m_playerSprite);
+Player::Player() : MovingObject(), m_lives(3) {
+	setPosition(sf::Vector2f(m_tileSize, m_tileSize));
+	m_type = PLAYER;
 }
 
-void Player::movePlayer(int x, int y, Board &board)
+void Player::lostLife()
 {
-	//check for collision
-	sf::Vector2f currentPosition = m_playerSprite.getPosition();
-	sf::Vector2f newPosition = currentPosition + sf::Vector2f(x * 69, y * 69);
+    if (m_lives > 0)
+    {
+        m_lives--;
+        respawn();
+    }
+    if (m_lives == 0) //game over
+    {
+        return;
+    }
+}
 
-//	if((newPosition == ))
-
-	m_playerSprite.move(x * m_tileSize, y * m_tileSize);
+void Player::respawn()
+{
+    setPosition(sf::Vector2f(m_tileSize, m_tileSize));
+    setDirection(sf::Keyboard::Space);
 }
